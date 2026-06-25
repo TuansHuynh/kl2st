@@ -1,0 +1,150 @@
+@use "../abstracts/mixins" as *;
+
+.guest-layout {
+    @include flex-center;
+
+    position: relative;
+    height: 100dvh;
+
+    background-image: url("/images/hotel.jpg");
+    background-size: cover;
+
+    &::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+
+        background: inherit;
+        filter: blur(2px);
+        z-index: 0;
+    }
+
+    .login,
+    .register,
+    .verify,
+    .recovery {
+        @include flex-center-column;
+
+        width: 500px;
+        height: auto;
+
+        position: relative;
+        z-index: 1;
+
+        padding: 10px 80px;
+        border-radius: 15px;
+
+        background-image: linear-gradient(to top left, #ffffff, #e3f2fd, #bbdefb);
+
+        .back-pages-button {
+            display: flex;
+
+            position: absolute;
+
+            top: 40px;
+            left: 5px;
+            padding: 7px;
+
+            border-radius: 50px;
+
+            cursor: pointer;
+
+            &:hover {
+                background-color: rgb(174, 219, 255);
+            }
+        }
+
+        .title {
+            font-family: "Playwrite GB J", cursive;
+            font-weight: 600;
+            font-size: 50px;
+            margin-bottom: 10px;
+        }
+
+        .input {
+            @include flex-center-column;
+
+            gap: 10px;
+
+            input {
+                border-radius: 10px;
+                font-size: 18px;
+                padding: 10px 10px;
+
+                background: rgba(255, 255, 255, 0.15);
+                color: rgb(180, 180, 180);
+
+                border: 1px solid rgba(255, 255, 255, 0.3);
+
+                &::placeholder {
+                    color: rgba(104, 104, 104, 0.6);
+                }
+
+                &:hover {
+                    border-color: rgba(255, 255, 255, 0.6);
+                    border-color: #00c6ff;
+                    box-shadow: 0 0 8px rgba(0, 198, 255, 0.5);
+                }
+
+                &:focus {
+                    outline: none;
+                    border-color: #00c6ff;
+                    box-shadow: 0 0 8px rgba(0, 198, 255, 0.5);
+                }
+
+                /* 👇 quan trọng: giữ style khi đã nhập text */
+                &:not(:placeholder-shown) {
+                    color: rgb(0, 0, 0);
+                    border-color: rgba(255, 255, 255, 0.5);
+                }
+            }
+
+            .button-login,
+            .button-register,
+            .button-verify,
+            .button-recovery {
+                display: flex;
+                justify-content: center;
+
+                width: 250px;
+                padding: 10px;
+
+                color: #bdbdbd;
+
+                font-size: 18px;
+                font-weight: 600;
+                border-radius: 10px;
+
+                background-color: rgba(107, 198, 255, 0.162);
+
+                transition: all 0.1s ease-in-out;
+
+                &:hover {
+                    background-color: rgba(44, 174, 255, 0.162);
+                    color: #1184a7;
+                }
+            }
+        }
+
+        .button {
+            display: flex;
+            justify-content: center;
+
+            .btn-login,
+            .btn-recovery,
+            .btn-register,
+            .btn-verify {
+                margin: 10px;
+                padding: 10px;
+                border-radius: 10px;
+                transition: all 0.2s ease-in-out;
+                color: #bdbdbd;
+
+                &:hover {
+                    color: #1184a7;
+                    background-color: rgba(44, 174, 255, 0.162);
+                }
+            }
+        }
+    }
+}
