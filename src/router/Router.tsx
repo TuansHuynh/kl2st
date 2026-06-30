@@ -3,13 +3,20 @@ import App from "../App";
 
 import MainLayout from "../pages/layout/MainLayout";
 import Home from "../pages/Main/Home" ;
-import FileStorage from "../pages/Main/FileStorage";
+// import FileStorage from "../pages/Main/FileStorage";
+import Document from "../pages/Main/Document/Document";
 
 import GuestLayout from "../pages/layout/GuestLayout";
 import Login from "../pages/Auth/Login";
 import Register from "../pages/Auth/Register";
 import RecoverPassword from "../pages/Auth/RecoverPassword";
 import VerifyAccount from "../pages/Auth/VerifyAccount";
+import ErrorPages from "../pages/ErrorPages";
+import Excel from "../pages/Main/Document/Excel";
+import Note from "../pages/Main/Document/Note";
+import Presentation from "../pages/Main/Document/Presentation";
+import AccountList from "../pages/Main/Account/AccountList";
+import GroupWork from "../pages/Main/Account/GroupWork";
 
 const routes = [
     {   path: "/",
@@ -17,7 +24,13 @@ const routes = [
         children: [
             {path: "/", element: <Home />},
             {path: "home", element: <Navigate to="/" />},
-            {path: "file-storage", element: <FileStorage />}
+            {path: "doc", element: <Document />},
+            {path: "excel", element: <Excel />},
+            {path: "present", element: <Presentation />},
+            {path: "note", element: <Note />},
+            
+            {path: "account", element: <AccountList />},
+            {path: "group", element: <GroupWork />},
         ]
     },
     {   path: "/",
@@ -28,6 +41,10 @@ const routes = [
             {path: "verify", element: <VerifyAccount />},
             {path: "recover", element: <RecoverPassword />},
         ]
+    },
+    {
+        path: "*",
+        element: <ErrorPages />
     }
 ]
 

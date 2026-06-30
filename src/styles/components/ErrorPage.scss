@@ -1,0 +1,138 @@
+// Định nghĩa các biến màu sắc cơ bản
+$primary-color: #4f46e5; // Màu tím Indigo hiện đại
+$primary-hover: #4338ca;
+$text-main: #1f2937;
+$text-muted: #4b5563;
+$bg-color: #f9fafb;
+$white: #ffffff;
+
+.error-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: $bg-color;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  position: relative;
+  overflow: hidden;
+  padding: 20px;
+  box-sizing: border-box;
+
+  .error-content {
+    text-align: center;
+    max-width: 550px;
+    width: 100%;
+    z-index: 10;
+    animation: fadeInUp 0.6s ease-out;
+  }
+
+  .error-code {
+    font-size: clamp(6rem, 15vw, 10rem); // Tự động co giãn kích thước chữ theo màn hình
+    font-weight: 900;
+    margin: 0;
+    line-height: 1;
+    background: linear-gradient(135deg, $primary-color, #818cf8);
+    --webkit-background-clip: text;
+    --webkit-text-fill-color: transparent;
+    letter-spacing: -0.05em;
+    user-select: none;
+  }
+
+  .error-title {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: 700;
+    color: $text-main;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .error-message {
+    font-size: 1rem;
+    color: $text-muted;
+    line-height: 1.6;
+    margin-bottom: 2.5rem;
+    padding: 0 15px;
+  }
+
+  .error-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+
+    .btn {
+      padding: 12px 24px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease-in-out;
+      outline: none;
+
+      &:active {
+        transform: scale(0.98);
+      }
+    }
+
+    .btn-primary {
+      background-color: $primary-color;
+      color: $white;
+      box-shadow: 0 4px 14px rgba($primary-color, 0.4);
+
+      &:hover {
+        background-color: $primary-hover;
+        box-shadow: 0 6px 20px rgba($primary-color, 0.6);
+      }
+    }
+
+    .btn-secondary {
+      background-color: $white;
+      color: $text-muted;
+      border: 1px solid #e5e7eb;
+
+      &:hover {
+        background-color: #f3f4f6;
+        color: $text-main;
+        border-color: #d1d5db;
+      }
+    }
+  }
+
+  // Các vòng tròn hiệu ứng background mờ
+  .bg-circle {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.4;
+    z-index: 1;
+  }
+
+  .circle-1 {
+    width: 300px;
+    height: 300px;
+    background-color: #c7d2fe;
+    top: -50px;
+    left: -50px;
+  }
+
+  .circle-2 {
+    width: 400px;
+    height: 400px;
+    background-color: #ddd6fe;
+    bottom: -100px;
+    right: -100px;
+  }
+}
+
+// Hiệu ứng xuất hiện mượt mà khi load trang
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -6,7 +6,7 @@ export default function MainLayout() {
     return (
         <div className="main-layout">
             <Header />
-            <div>
+            <div  style={{display: "flex"}}>
                 <div>
                     <Menu />
                 </div>
