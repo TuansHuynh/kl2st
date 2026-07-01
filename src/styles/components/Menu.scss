@@ -1,0 +1,44 @@
+.menu {
+    display: flex;
+    font-family: 'Roboto';
+
+    .nav-menu {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        padding: 5px;
+
+        background-color: darkblue;
+
+        gap: 10px;
+        width: 175px;
+
+        a, span{
+            color: white;
+        }
+
+        .menu-container {
+            cursor: pointer;
+
+            .title-container{
+                display: flex;
+                justify-content: space-between;
+                padding: 5px;
+            }
+
+            .menu-list {
+                display: flex;
+                flex-direction: column;
+                margin-left: 10px;
+                transition: all;
+            }
+        }
+
+        .link{
+            background-color: lightblue;
+            padding: 10px;
+            margin: 2px;
+            border-radius: 0 10px 10px 0;
+        }
+    }
+}

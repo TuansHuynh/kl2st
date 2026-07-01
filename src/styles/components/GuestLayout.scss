@@ -9,6 +9,10 @@
     background-image: url("/images/hotel.jpg");
     background-size: cover;
 
+    a{
+        color: black;
+    }
+
     &::before {
         content: "";
         position: absolute;

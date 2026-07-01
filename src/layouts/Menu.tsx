@@ -23,37 +23,36 @@ export default function Menu() {
     }
 
     return (
-        <div className='' style={{ display: "flex", flexDirection: "column" }}>
-            <NavLink className='' to="/">
-                Home
-            </NavLink>
-            <div className='' >
-                <div className=''>
-                    <div className='' onClick={handleStorage} aria-expanded={isStorageOpen}>
-                        <span> File Storage </span>
-                        {isExpanded && <ArrowDropDownIcon />}
-                    </div>
+        <div className='nav-menu' >
 
-                    {isStorageOpen && (
-                        <div className=''>
-                            <NavLink className='' to="/doc"> Document </NavLink>
-                            <NavLink className='' to="/excel"> Excel </NavLink>
-                            <NavLink className='' to="/present"> Presentation </NavLink>
-                            <NavLink className='' to="/note"> Note </NavLink>
-                        </div>
-                    )}
+            <NavLink className='link home-link' to="/">Home</NavLink>
+
+            <div className='menu-container' >
+                <div className='title-container' onClick={handleStorage} aria-expanded={isStorageOpen}>
+                    <span> File Storage </span>
+                    {isExpanded && <ArrowDropDownIcon className='nav-caret'/>}
                 </div>
+
+                {isStorageOpen && (
+                    <div className='menu-list' style={{ display: "flex", flexDirection: "column" }}>
+                        <NavLink className='link doc-link' to="/doc"> Document </NavLink>
+                        <NavLink className='link excel-link' to="/excel"> Excel </NavLink>
+                        <NavLink className='link present-link' to="/present"> Presentation </NavLink>
+                        <NavLink className='link note-link' to="/note"> Note </NavLink>
+                    </div>
+                )}
             </div>
-            <div>
-                <div className='' onClick={handleGroup} aria-expanded={isGroup}>
+
+            <div className='menu-container'>
+                <div className='title-container' onClick={handleGroup} aria-expanded={isGroup}>
                     <span>Group</span>
-                    {isExpanded && <ArrowDropDownIcon />}
+                    {isExpanded && <ArrowDropDownIcon className=''/>}
                 </div>
 
                 {isGroup && (
-                    <div>
-                        <NavLink to="/account"> Account </NavLink>
-                        <NavLink to="/group"> Group </NavLink>
+                    <div className='menu-list' style={{ display: "flex", flexDirection: "column" }}>
+                        <NavLink className='link account-link' to="/account"> Account </NavLink>
+                        <NavLink className='link group-link' to="/group"> Group </NavLink>
                     </div>
                 )}
             </div>
