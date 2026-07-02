@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "documentId": "doc_001",
+    "userId": "user_001",
+    "action": "CREATE",
+    "time": "2026-05-18T09:30:00Z"
+  },
+  {
+    "id": 2,
+    "documentId": "doc_001",
+    "userId": "user_002",
+    "action": "EDIT",
+    "time": "2026-06-28T14:00:00Z"
+  },
+  {
+    "id": 3,
+    "documentId": "doc_001",
+    "userId": "user_003",
+    "action": "VIEW",
+    "time": "2026-07-01T10:20:00Z"
+  }
+]

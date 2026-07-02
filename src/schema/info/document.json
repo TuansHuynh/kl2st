@@ -1,0 +1,44 @@
+[
+  {
+    "id": "doc_001",
+    "title": "Software Requirement Specification",
+    "type": "pdf",
+    "folderId": "folder_project",
+    "ownerId": "user_001",
+    "version": "2.3.1",
+    "size": 2847365,
+    "status": "published",
+    "favorite": true,
+    "shared": true,
+    "thumbnail": "/thumbnail/doc_001.png",
+    "updatedAt": "2026-06-28T14:10:00Z"
+  },
+  {
+    "id": "doc_002",
+    "title": "Database Design",
+    "type": "docx",
+    "folderId": "folder_project",
+    "ownerId": "user_002",
+    "version": "1.4.0",
+    "size": 956214,
+    "status": "draft",
+    "favorite": false,
+    "shared": false,
+    "thumbnail": "/thumbnail/doc_002.png",
+    "updatedAt": "2026-06-29T15:30:00Z"
+  },
+  {
+    "id": "doc_003",
+    "title": "UI Guideline",
+    "type": "figma",
+    "folderId": "folder_design",
+    "ownerId": "user_003",
+    "version": "5.0.0",
+    "size": 0,
+    "status": "published",
+    "favorite": true,
+    "shared": true,
+    "thumbnail": "/thumbnail/doc_003.png",
+    "updatedAt": "2026-06-18T09:15:00Z"
+  }
+]

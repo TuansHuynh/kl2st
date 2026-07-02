@@ -1,0 +1,22 @@
+[
+  {
+    "id": "folder_root",
+    "name": "Documents",
+    "parentId": null
+  },
+  {
+    "id": "folder_project",
+    "name": "Project",
+    "parentId": "folder_root"
+  },
+  {
+    "id": "folder_design",
+    "name": "Design",
+    "parentId": "folder_root"
+  },
+  {
+    "id": "folder_meeting",
+    "name": "Meeting",
+    "parentId": "folder_root"
+  }
+]

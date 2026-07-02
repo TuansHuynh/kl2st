@@ -1,0 +1,19 @@
+[
+  {
+    "documentId": "doc_001",
+    "versions": [
+      {
+        "version": "2.3.1",
+        "createdBy": "user_001",
+        "createdAt": "2026-06-28T14:10:00Z",
+        "size": 2847365
+      },
+      {
+        "version": "2.3.0",
+        "createdBy": "user_001",
+        "createdAt": "2026-06-20T09:00:00Z",
+        "size": 2785214
+      }
+    ]
+  }
+]

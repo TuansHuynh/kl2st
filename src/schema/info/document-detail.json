@@ -1,0 +1,24 @@
+{
+  "id": "doc_001",
+  "title": "Software Requirement Specification",
+  "description": "Đặc tả toàn bộ yêu cầu của hệ thống.",
+  "type": "pdf",
+  "language": "vi",
+  "pageCount": 62,
+  "size": 2847365,
+  "version": "2.3.1",
+  "ownerId": "user_001",
+  "folderId": "folder_project",
+  "previewUrl": "/preview/doc_001",
+  "downloadUrl": "/download/doc_001",
+  "storagePath": "/storage/project/srs.pdf",
+  "createdAt": "2026-05-18T09:30:00Z",
+  "updatedAt": "2026-06-28T14:10:00Z",
+  "views": 189,
+  "downloads": 54,
+  "tags": [
+    "Backend",
+    "API",
+    "Architecture"
+  ]
+}

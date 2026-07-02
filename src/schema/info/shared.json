@@ -1,0 +1,17 @@
+[
+  {
+    "documentId": "doc_001",
+    "sharedWith": [
+      "user_002",
+      "user_003"
+    ],
+    "permission": "edit"
+  },
+  {
+    "documentId": "doc_003",
+    "sharedWith": [
+      "user_001"
+    ],
+    "permission": "view"
+  }
+]

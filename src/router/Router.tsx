@@ -5,18 +5,21 @@ import MainLayout from "../pages/layout/MainLayout";
 import Home from "../pages/Main/Home" ;
 // import FileStorage from "../pages/Main/FileStorage";
 import Document from "../pages/Main/Document/Document";
+import Excel from "../pages/Main/Document/Excel";
+import Note from "../pages/Main/Document/Note";
+import Presentation from "../pages/Main/Document/Presentation";
+import AccountList from "../pages/Main/Account/AccountList";
+import TeamWork from "../pages/Main/Account/TeamWork";
+
 
 import GuestLayout from "../pages/layout/GuestLayout";
 import Login from "../pages/Auth/Login";
 import Register from "../pages/Auth/Register";
 import RecoverPassword from "../pages/Auth/RecoverPassword";
 import VerifyAccount from "../pages/Auth/VerifyAccount";
+
 import ErrorPages from "../pages/ErrorPages";
-import Excel from "../pages/Main/Document/Excel";
-import Note from "../pages/Main/Document/Note";
-import Presentation from "../pages/Main/Document/Presentation";
-import AccountList from "../pages/Main/Account/AccountList";
-import GroupWork from "../pages/Main/Account/GroupWork";
+import Meeting from "../pages/Main/Account/Meeting";
 
 const routes = [
     {   path: "/",
@@ -30,7 +33,8 @@ const routes = [
             {path: "note", element: <Note />},
             
             {path: "account", element: <AccountList />},
-            {path: "group", element: <GroupWork />},
+            {path: "team", element: <TeamWork />},
+            {path: "meeting", element: <Meeting />}
         ]
     },
     {   path: "/",

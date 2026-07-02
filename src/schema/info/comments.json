@@ -1,0 +1,16 @@
+[
+  {
+    "id": "comment_001",
+    "documentId": "doc_001",
+    "userId": "user_002",
+    "content": "Nên bổ sung phần API Authentication.",
+    "createdAt": "2026-06-28T15:00:00Z"
+  },
+  {
+    "id": "comment_002",
+    "documentId": "doc_001",
+    "userId": "user_003",
+    "content": "Đã review xong.",
+    "createdAt": "2026-06-29T08:00:00Z"
+  }
+]
