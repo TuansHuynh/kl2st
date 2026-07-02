@@ -20,6 +20,7 @@ import VerifyAccount from "../pages/Auth/VerifyAccount";
 
 import ErrorPages from "../pages/ErrorPages";
 import Meeting from "../pages/Main/Account/Meeting";
+import Setting from "../pages/Main/Setting";
 
 const routes = [
     {   path: "/",
@@ -34,7 +35,9 @@ const routes = [
             
             {path: "account", element: <AccountList />},
             {path: "team", element: <TeamWork />},
-            {path: "meeting", element: <Meeting />}
+            {path: "meeting", element: <Meeting />},
+            
+            {path: "setting", element: <Setting />},
         ]
     },
     {   path: "/",

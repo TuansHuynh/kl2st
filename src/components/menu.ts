@@ -65,4 +65,9 @@ export const menuTree: MenuNode[] = [
         name: "Setting",
         path: "/setting"
     },
+    {
+        id: "help",
+        name: "Help",
+        path: "/help"
+    },
 ];

@@ -2,9 +2,12 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { menuTree } from "../types/menu";
+import { menuTree } from "../components/menu";
+
 
 export default function Menu() {
+    console.log(menuTree.map((x) => x.name));
+
     const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
 
     const toggleMenu = (id: string) => {
