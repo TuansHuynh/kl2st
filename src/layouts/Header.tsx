@@ -6,7 +6,7 @@ export default function Header() {
     const [search, setSearch] = useState("");
 
     return (
-        <div style={{display: "flex", alignItems: "center", justifyContent: "space-between"}}>
+        <div style={{display: "flex", alignItems: "center", justifyContent: "space-between", height: "12dvh"}}>
             <Logo />
 
             <div style={{ display: "flex", justifyContent: "center"}}>
