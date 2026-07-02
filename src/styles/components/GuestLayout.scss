@@ -1,4 +1,5 @@
 @use "../abstracts/mixins" as *;
+@use "../base/global" as *;
 
 .guest-layout {
     @include flex-center;
@@ -10,7 +11,7 @@
     background-size: cover;
 
     a{
-        color: black;
+        color: $text-black;
     }
 
     &::before {
@@ -98,7 +99,7 @@
 
                 /* 👇 quan trọng: giữ style khi đã nhập text */
                 &:not(:placeholder-shown) {
-                    color: rgb(0, 0, 0);
+                    color: $text-black;
                     border-color: rgba(255, 255, 255, 0.5);
                 }
             }

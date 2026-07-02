@@ -1,15 +1,8 @@
-// Định nghĩa các biến màu sắc cơ bản
-$primary-color: #4f46e5; // Màu tím Indigo hiện đại
-$primary-hover: #4338ca;
-$text-main: #1f2937;
-$text-muted: #4b5563;
-$bg-color: #f9fafb;
-$white: #ffffff;
+@use "../abstracts/mixins" as *;
+@use "../base/global" as *;
 
 .error-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   min-height: 100vh;
   background-color: $bg-color;
   font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -55,9 +48,8 @@ $white: #ffffff;
   }
 
   .error-actions {
-    display: flex;
+    @include flex;
     gap: 15px;
-    justify-content: center;
     flex-wrap: wrap;
 
     .btn {

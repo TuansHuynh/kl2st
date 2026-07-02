@@ -1,26 +1,50 @@
+@use "../base/global" as *;
+
 .menu {
     display: flex;
     font-family: 'Roboto';
 
     .nav-menu {
         display: flex;
-        justify-content: center;
         flex-direction: column;
         padding: 5px;
-
-        background-color: darkblue;
-
-        gap: 10px;
+        // background-color: darkblue;
+        gap: 5px;
         width: 175px;
+        height: 88.3dvh;
+        overflow: scroll;
+        overflow-x: hidden;
+        overflow-y: none;
 
-        a, span{
-            color: white;
+        &::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, .3);
+            border-radius: 999px;
+        }
+
+        &::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, .6);
+        }
+
+
+        a,
+        span {
+            color: $text-black;
+            text-decoration: none;
+            
         }
 
         .menu-container {
             cursor: pointer;
 
-            .title-container{
+            .title-container {
                 display: flex;
                 justify-content: space-between;
                 padding: 5px;
@@ -34,8 +58,8 @@
             }
         }
 
-        .link{
-            background-color: lightblue;
+        .link {
+            // background-color: lightblue;
             padding: 10px;
             margin: 2px;
             border-radius: 0 10px 10px 0;

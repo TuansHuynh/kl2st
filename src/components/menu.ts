@@ -36,7 +36,7 @@ export const menuTree: MenuNode[] = [
                 id: "note",
                 name: "Note",
                 path: "/note"
-            }
+            },
         ]
     },
     {
