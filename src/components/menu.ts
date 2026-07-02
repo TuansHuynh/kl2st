@@ -61,8 +61,8 @@ export const menuTree: MenuNode[] = [
         ]
     },
     {
-        id: "manage-account",
-        name: "Manage Account",
-        path: "/"
+        id: "setting",
+        name: "Setting",
+        path: "/setting"
     },
 ];

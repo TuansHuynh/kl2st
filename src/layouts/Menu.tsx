@@ -1,77 +1,68 @@
-// import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-// import { useState } from "react";
-// import { NavLink } from "react-router-dom";
-
-// export default function Menu() {
-//     const [isExpanded, setIsExpanded] = useState(true);
-//     const [isStorageOpen, setIsStorageOpen] = useState(false);
-//     const [isGroup, setIsGroup] = useState(false)
-
-//     const handleStorage = () => {
-//         if (!isExpanded) {
-//             setIsExpanded(true)
-//         }
-//         setIsStorageOpen((prev) => !prev)
-//     }
-
-//     const handleGroup = () => {
-//         if (!isExpanded) {
-//             setIsExpanded(true)
-//         }
-//         setIsGroup((prev) => !prev)
-//     }
-
-//     return (
-//         <div className='nav-menu' >
-
-//             <NavLink className='link home-link' to="/">Home</NavLink>
-
-//             <div className='menu-container' >
-//                 <div className='title-container' onClick={handleStorage} aria-expanded={isStorageOpen}>
-//                     <span> File Storage </span>
-//                     {isExpanded && <ArrowDropDownIcon className='nav-caret'/>}
-//                 </div>
-
-//                 {isStorageOpen && (
-//                     <div className='menu-list' style={{ display: "flex", flexDirection: "column" }}>
-//                         <NavLink className='link doc-link' to="/doc"> Document </NavLink>
-//                         <NavLink className='link excel-link' to="/excel"> Excel </NavLink>
-//                         <NavLink className='link present-link' to="/present"> Presentation </NavLink>
-//                         <NavLink className='link note-link' to="/note"> Note </NavLink>
-//                     </div>
-//                 )}
-//             </div>
-
-//             <div className='menu-container'>
-//                 <div className='title-container' onClick={handleGroup} aria-expanded={isGroup}>
-//                     <span>Group</span>
-//                     {isExpanded && <ArrowDropDownIcon className=''/>}
-//                 </div>
-
-//                 {isGroup && (
-//                     <div className='menu-list' style={{ display: "flex", flexDirection: "column" }}>
-//                         <NavLink className='link account-link' to="/account"> Account </NavLink>
-//                         <NavLink className='link group-link' to="/team"> Team </NavLink>
-//                         <NavLink className='link group-link' to="/meeting"> Meeting </NavLink>
-//                     </div>
-//                 )}
-//             </div>
-//         </div>
-//     )
-// }
-
-import TreeItem from "../components/common/TreeItem";
-import { menuTree } from "../components/menu";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+import { useState } from "react";
+import { NavLink } from "react-router-dom";
+import { menuTree } from "../types/menu";
 
 export default function Menu() {
+    const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
+
+    const toggleMenu = (id: string) => {
+        setOpenMenus((prev) => ({
+            ...prev,
+            [id]: !prev[id],
+        }));
+    };
+
     return (
         <div className="nav-menu">
-            {menuTree.map(item => (
-                <TreeItem
-                    key={item.id}
-                    node={item}
-                />
-            ))}
+            {menuTree.map((node) => {
+                // Menu không có children => Link bình thường
+                if (!node.children || node.children.length === 0) {
+                    return (
+                        <NavLink
+                            key={node.id}
+                            className={`link ${node.id}-link`}
+                            to={node.path!}
+                        >
+                            {node.name}
+                        </NavLink>
+                    );
+                }
+
+                // Menu có children => Accordion
+                return (
+                    <div className="menu-container" key={node.id}>
+                        <div
+                            className="title-container"
+                            onClick={() => toggleMenu(node.id)}
+                            aria-expanded={!!openMenus[node.id]}
+                        >
+                            <span>{node.name}</span>
+
+                            {openMenus[node.id] ? (
+                                <KeyboardArrowDownIcon fontSize="small" />
+                            ) : (
+                                <KeyboardArrowRightIcon fontSize="small" />
+                            )}
+                        </div>
+
+                        {openMenus[node.id] && (
+                            <div className="menu-list">
+                                {node.children.map((child) => (
+                                    <NavLink
+                                        key={child.id}
+                                        className={`link ${child.id}-link`}
+                                        to={child.path!}
+                                    >
+                                        {child.name}
+                                    </NavLink>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                );
+            })}
         </div>
     );
 }
