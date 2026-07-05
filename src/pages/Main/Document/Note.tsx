@@ -1,4 +1,4 @@
-export default function Note() {
+export default function  Note () {
     return (
         <>
             This is Note Pages

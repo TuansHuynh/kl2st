@@ -6,14 +6,14 @@ export default function Header() {
     const [search, setSearch] = useState("");
 
     return (
-        <div style={{display: "flex", alignItems: "center", justifyContent: "space-between", height: "12dvh"}}>
+        <div className="header">
             <Logo />
 
-            <div style={{ display: "flex", justifyContent: "center"}}>
+            <div className="search">
                 <Input
                     type="text"
                     input="Search..."
-                    classname=""
+                    classname="input-search"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                 />

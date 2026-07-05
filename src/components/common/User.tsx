@@ -14,16 +14,16 @@ export default function User() {
     return (
         <>
             {avatar ? (
-                <div className="user-container" style={{ display: "flex" }}>
-                    <img className="avatar-img" src="/images/avatar.png" alt="avatar" title="Avatar" width="60" style={{ borderRadius: "50px" }} />
+                <div className="user">
+                    <img className="avatar-img" src="/images/avatar.png" alt="avatar" title="Avatar" />
                     <div className="user-info">
-                        <h3 className="user-name">Name</h3>
-                        <p className="user-info">abc</p>
+                        <h3 className="user-name">Tunas</h3>
+                        {/* <p className="user-info">nkoc.nho.17.04@gmail.com</p> */}
                         <button className="button-logout" onClick={hanldeLinkClick}>Logout</button>
                     </div>
                 </div>
             ) : (
-                <div className="user-container">
+                <div className="user">
                     <AccountCircle className="avatar-img" />
                 </div>
             )}

@@ -1,0 +1,75 @@
+@use "../abstracts/mixins" as *;
+
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 10dvh;
+    // background-color: red;
+
+    .logo {
+        @include flex-center;
+        cursor: pointer;
+    }
+
+    .search {
+        @include flex-center;
+
+        &:hover {
+            .input-search {
+                background-color: rgb(98, 187, 255);
+            }
+
+            .search-bar {
+                color: #000000;
+            }
+
+        }
+
+        .input-search {
+            background-color: rgba(98, 187, 255, 0.3);
+            padding: 10px;
+            margin: 10px;
+            border-radius: 10px;
+            transition: all 0.3s ease-in-out;
+
+            &::placeholder {
+                color: rgb(65, 65, 65);
+                font-size: 18px;
+            }
+
+            &:focus {
+                background-color: rgb(98, 187, 255);
+            }
+        }
+
+        .search-icon {
+            @include flex;
+
+            .search-bar {
+                font-size: 30px;
+                color: rgba(0, 0, 0, 0.5);
+                transition: all 0.3s ease-in-out;
+
+                &:hover {
+                    color: #000000;
+                }
+            }
+        }
+    }
+
+    .user {
+        @include flex-center;
+        margin: 0 10px;
+
+        img {
+            @include flex-center;
+            width: 60px;
+            height: 60px;
+            border-radius: 35%;
+            margin: 0 5px;
+        }
+    }
+
+}

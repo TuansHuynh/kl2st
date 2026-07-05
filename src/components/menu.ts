@@ -23,6 +23,11 @@ export const menuTree: MenuNode[] = [
                 ]
             },
             {
+                id: "note",
+                name: "Word",
+                path: "/word"
+            },
+            {
                 id: "excel",
                 name: "Excel",
                 path: "/excel"
@@ -44,11 +49,6 @@ export const menuTree: MenuNode[] = [
         name: "Group",
         children: [
             {
-                id: "account",
-                name: "Account",
-                path: "/account"
-            },
-            {
                 id: "team",
                 name: "Team",
                 path: "/team"
@@ -59,6 +59,11 @@ export const menuTree: MenuNode[] = [
                 path: "/meeting"
             },
         ]
+    },
+    {
+        id: "account",
+        name: "Account",
+        path: "/account"
     },
     {
         id: "setting",

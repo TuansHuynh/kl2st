@@ -4,7 +4,7 @@ export default function SearchBar () {
 
     return (
         <>
-            <div style={{display: "flex", justifyContent: "center"}}>
+            <div className="search-icon">
                 <Search className="search-bar"/>
             </div>
         </>
