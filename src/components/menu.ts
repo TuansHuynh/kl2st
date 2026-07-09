@@ -16,31 +16,39 @@ export const menuTree: MenuNode[] = [
         name: "File Storage",
         children: [
             {
-                id: "doc",
-                name: "Document",
-                path: "/doc",
-                children: [
-                ]
+                id: "pdf",
+                name: "PDF",
+                path: "/pdf",
             },
             {
-                id: "note",
+                id: "word",
                 name: "Word",
-                path: "/word"
+                path: "/word",
             },
             {
                 id: "excel",
                 name: "Excel",
-                path: "/excel"
+                path: "/excel",
             },
             {
-                id: "presentation",
-                name: "Presentation",
-                path: "/present"
+                id: "media",
+                name: "Media",
+                path: "/media",
+            },
+            {
+                id: "zip-rar",
+                name: "ZIP/RAR",
+                path: "/zip",
             },
             {
                 id: "note",
                 name: "Note",
-                path: "/note"
+                path: "/note",
+            },
+            {
+                id: "different",
+                name: "Different",
+                path: "/different",
             },
         ]
     },

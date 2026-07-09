@@ -5,8 +5,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 10dvh;
-    // background-color: red;
+    height: 8dvh;
+    background-color: rgb(255, 255, 255);
 
     .logo {
         @include flex-center;
@@ -28,15 +28,15 @@
         }
 
         .input-search {
-            background-color: rgba(98, 187, 255, 0.3);
+            background-color: rgba(98, 187, 255, 0.5);
             padding: 10px;
             margin: 10px;
+            font-size: 18px;
             border-radius: 10px;
             transition: all 0.3s ease-in-out;
 
             &::placeholder {
                 color: rgb(65, 65, 65);
-                font-size: 18px;
             }
 
             &:focus {
@@ -65,10 +65,11 @@
 
         img {
             @include flex-center;
-            width: 60px;
-            height: 60px;
+            width: 7dvh;
+            height: 7dvh;
             border-radius: 35%;
             margin: 0 5px;
+
         }
     }
 

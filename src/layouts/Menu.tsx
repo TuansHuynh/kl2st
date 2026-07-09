@@ -2,7 +2,7 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { menuTree } from "../components/menu";
+import { menuTree, type MenuNode } from '../components/menu';
 
 
 export default function Menu() {
@@ -17,55 +17,48 @@ export default function Menu() {
         }));
     };
 
+    const renderMenu = (node: MenuNode, level = 0) => {
+    if (!node.children || node.children.length === 0) {
+        return (
+            <NavLink
+                key={node.id}
+                className={ ({ isActive }) => `link ${node.id}-link level-${level} ${isActive ? "active" : ""}`}
+                to={node.path ?? "*"}
+            >
+                {node.name}
+            </NavLink>
+        );
+    }
+
+    return (
+        <div className="menu-container" key={node.id}>
+            <div
+                className="title-container"
+                onClick={() => toggleMenu(node.id)}
+            >
+                <span>{node.name}</span>
+
+                {openMenus[node.id] ? (
+                    <KeyboardArrowDownIcon fontSize="small" />
+                ) : (
+                    <KeyboardArrowRightIcon fontSize="small" />
+                )}
+            </div>
+
+            {openMenus[node.id] && (
+                <div className={`menu-list level-${level}`}>
+                    {node.children.map((child) =>
+                        renderMenu(child, level + 1)
+                    )}
+                </div>
+            )}
+        </div>
+    );
+};
+
     return (
         <div className="nav-menu">
-            {menuTree.map((node) => {
-                // Menu không có children => Link bình thường
-                if (!node.children || node.children.length === 0) {
-                    return (
-                        <NavLink
-                            key={node.id}
-                            className={`link ${node.id}-link`}
-                            to={node.path!}
-                        >
-                            {node.name}
-                        </NavLink>
-                    );
-                }
-
-                // Menu có children => Accordion
-                return (
-                    <div className="menu-container" key={node.id}>
-                        <div
-                            className="title-container"
-                            onClick={() => toggleMenu(node.id)}
-                            aria-expanded={!!openMenus[node.id]}
-                        >
-                            <span>{node.name}</span>
-
-                            {openMenus[node.id] ? (
-                                <KeyboardArrowDownIcon fontSize="small" />
-                            ) : (
-                                <KeyboardArrowRightIcon fontSize="small" />
-                            )}
-                        </div>
-
-                        {openMenus[node.id] && (
-                            <div className="menu-list">
-                                {node.children.map((child) => (
-                                    <NavLink
-                                        key={child.id}
-                                        className={`link ${child.id}-link`}
-                                        to={child.path!}
-                                    >
-                                        {child.name}
-                                    </NavLink>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                );
-            })}
+            {menuTree.map((node) => renderMenu(node))}
         </div>
     );
 }
