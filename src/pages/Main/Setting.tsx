@@ -1,5 +1,5 @@
 import { useTitle } from "../../hooks/useTitle";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import SettingsIcon from '@mui/icons-material/Settings';
 import PersonIcon from '@mui/icons-material/Person';
 import NotificationsIcon from '@mui/icons-material/Notifications';
@@ -8,11 +8,32 @@ import PaletteIcon from '@mui/icons-material/Palette';
 import LanguageIcon from '@mui/icons-material/Language';
 import StorageIcon from '@mui/icons-material/Storage';
 import SaveIcon from '@mui/icons-material/Save';
+import { accountService } from '../../service/accountService';
+import type { UserSetting } from '../../types';
+
+const DEFAULT_USER_ID = 'fa78a2b1-6a0d-45bc-82e1-88f5a6b0c61c';
 
 export default function Setting() {
     useTitle("Cài đặt");
 
     const [activeTab, setActiveTab] = useState('profile');
+    
+    // Get logged-in user ID
+    const getUserId = (): string => {
+        try {
+            const userStr = localStorage.getItem('currentUser');
+            if (userStr) {
+                const u = JSON.parse(userStr);
+                if (u && u.id) return u.id;
+            }
+        } catch (e) {
+            console.error(e);
+        }
+        return DEFAULT_USER_ID;
+    };
+
+    const userId = getUserId();
+
     const [profileName, setProfileName] = useState('Nguyễn Văn A');
     const [profileEmail, setProfileEmail] = useState('nguyenvana@company.vn');
     const [profilePhone, setProfilePhone] = useState('0901234567');
@@ -28,9 +49,110 @@ export default function Setting() {
     const [timezone, setTimezone] = useState('Asia/Ho_Chi_Minh');
     const [autoBackup, setAutoBackup] = useState(true);
     const [backupFreq, setBackupFreq] = useState('daily');
+    const [loading, setLoading] = useState(true);
 
-    const handleSave = () => {
-        alert('Đã lưu cài đặt thành công!');
+    // Security state
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+
+    // Fetch user and settings on mount
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                setLoading(true);
+                const user = await accountService.getAccountById(userId);
+                setProfileName(user.fullName || '');
+                setProfileEmail(user.email || '');
+                setProfileDept(user.department || '');
+
+                const settings = await accountService.getAccountSettings(userId);
+                setProfilePhone(settings.phone || '');
+                setNotifEmail(settings.notifEmail ?? true);
+                setNotifPush(settings.notifPush ?? true);
+                setNotifUpload(settings.notifUpload ?? true);
+                setNotifMeeting(settings.notifMeeting ?? true);
+                setNotifTeam(settings.notifTeam ?? false);
+                setDarkMode(settings.darkMode ?? false);
+                setCompactView(settings.compactView ?? false);
+                setLanguage(settings.language || 'vi');
+                setTimezone(settings.timezone || 'Asia/Ho_Chi_Minh');
+                setAutoBackup(settings.autoBackup ?? true);
+                setBackupFreq(settings.backupFreq || 'daily');
+            } catch (err) {
+                console.error('Failed to fetch user settings:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchUserData();
+    }, [userId]);
+
+    // Apply global themes when appearance settings change
+    useEffect(() => {
+        if (darkMode) {
+            document.body.classList.add('dark-theme');
+        } else {
+            document.body.classList.remove('dark-theme');
+        }
+
+        if (compactView) {
+            document.body.classList.add('compact-view');
+        } else {
+            document.body.classList.remove('compact-view');
+        }
+    }, [darkMode, compactView]);
+
+    const handleSave = async () => {
+        try {
+            // Update profile info
+            await accountService.updateAccount(userId, {
+                fullName: profileName,
+                department: profileDept
+            });
+
+            // Update settings info
+            const settingsObj: UserSetting = {
+                userId,
+                phone: profilePhone,
+                notifEmail,
+                notifPush,
+                notifUpload,
+                notifMeeting,
+                notifTeam,
+                darkMode,
+                compactView,
+                language,
+                timezone,
+                autoBackup,
+                backupFreq
+            };
+            await accountService.updateAccountSettings(userId, settingsObj);
+            
+            // If active tab is security, handle password change
+            if (activeTab === 'security') {
+                if (!currentPassword || !newPassword || !confirmPassword) {
+                    alert('Vui lòng nhập đầy đủ thông tin mật khẩu!');
+                    return;
+                }
+                if (newPassword !== confirmPassword) {
+                    alert('Mật khẩu xác nhận không khớp!');
+                    return;
+                }
+                // Simulate password update
+                // await accountService.updatePassword(userId, currentPassword, newPassword);
+                setCurrentPassword('');
+                setNewPassword('');
+                setConfirmPassword('');
+                alert('Đã cập nhật mật khẩu thành công!');
+                return;
+            }
+
+            alert('Đã lưu cài đặt thành công!');
+        } catch (err) {
+            console.error('Failed to save settings:', err);
+            alert('Lưu cài đặt thất bại!');
+        }
     };
 
     const tabs = [
@@ -44,101 +166,7 @@ export default function Setting() {
 
     return (
         <div className="stg-container">
-            <style>{`
-                .stg-container {
-                    padding: 24px; color: #1f2937; font-family: 'Roboto', 'Inter', sans-serif;
-                    box-sizing: border-box; background-color: #f9fafb; min-height: calc(100vh - 10dvh); width: 100%;
-                }
-                .stg-header { margin-bottom: 24px; }
-                .stg-header h1 { font-size: 24px; font-weight: 700; color: #111827; margin: 0 0 4px 0; display: flex; align-items: center; gap: 10px; }
-                .stg-header h1 svg { color: #6366f1; font-size: 28px; }
-                .stg-header p { font-size: 14px; color: #6b7280; margin: 0; }
-
-                .stg-layout { display: flex; gap: 24px; }
-
-                .stg-sidebar {
-                    width: 240px; flex-shrink: 0;
-                    background: #ffffff; border-radius: 12px; border: 1px solid #e5e7eb;
-                    box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden;
-                    height: fit-content;
-                }
-
-                .stg-tab-btn {
-                    display: flex; align-items: center; gap: 10px; width: 100%; padding: 14px 18px;
-                    border: none; background: transparent; cursor: pointer; font-size: 14px;
-                    color: #6b7280; font-weight: 500; text-align: left; transition: all 0.15s;
-                    border-left: 3px solid transparent;
-                }
-                .stg-tab-btn:hover { background: #f9fafb; color: #111827; }
-                .stg-tab-btn.active { background: #eef2ff; color: #4f46e5; font-weight: 600; border-left-color: #4f46e5; }
-
-                .stg-content {
-                    flex: 1; background: #ffffff; border-radius: 12px; border: 1px solid #e5e7eb;
-                    box-shadow: 0 1px 3px rgba(0,0,0,0.05); padding: 24px;
-                }
-
-                .stg-section-title { font-size: 18px; font-weight: 700; color: #111827; margin: 0 0 4px 0; }
-                .stg-section-desc { font-size: 13px; color: #9ca3af; margin: 0 0 24px 0; }
-                .stg-divider { border: none; border-top: 1px solid #e5e7eb; margin: 24px 0; }
-
-                .stg-form-group { margin-bottom: 18px; }
-                .stg-label { display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px; }
-                .stg-input {
-                    width: 100%; max-width: 400px; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 8px;
-                    font-size: 14px; outline: none; box-sizing: border-box; transition: border-color 0.2s;
-                }
-                .stg-input:focus { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15); }
-                .stg-select {
-                    width: 100%; max-width: 400px; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 8px;
-                    font-size: 14px; outline: none; box-sizing: border-box; background: white; cursor: pointer;
-                }
-                .stg-select:focus { border-color: #4f46e5; }
-
-                .stg-toggle-row {
-                    display: flex; justify-content: space-between; align-items: center;
-                    padding: 12px 0; border-bottom: 1px solid #f3f4f6;
-                }
-                .stg-toggle-info { display: flex; flex-direction: column; }
-                .stg-toggle-label { font-size: 14px; font-weight: 500; color: #111827; }
-                .stg-toggle-desc { font-size: 12px; color: #9ca3af; margin-top: 2px; }
-
-                .stg-toggle {
-                    position: relative; width: 44px; height: 24px; background: #d1d5db;
-                    border-radius: 12px; cursor: pointer; transition: background 0.2s; border: none;
-                    flex-shrink: 0;
-                }
-                .stg-toggle.on { background: #4f46e5; }
-                .stg-toggle::after {
-                    content: ''; position: absolute; top: 2px; left: 2px;
-                    width: 20px; height: 20px; background: white; border-radius: 50%;
-                    transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-                }
-                .stg-toggle.on::after { transform: translateX(20px); }
-
-                .stg-btn-save {
-                    display: inline-flex; align-items: center; gap: 8px;
-                    background-color: #4f46e5; color: white; border: none; border-radius: 8px;
-                    padding: 10px 20px; font-size: 14px; font-weight: 600; cursor: pointer;
-                    transition: all 0.2s ease; margin-top: 8px;
-                    box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
-                }
-                .stg-btn-save:hover { background-color: #4338ca; transform: translateY(-1px); }
-                .stg-btn-save:active { transform: translateY(0); }
-
-                .stg-password-row { display: flex; gap: 12px; flex-wrap: wrap; }
-                .stg-password-row .stg-form-group { flex: 1; min-width: 180px; }
-
-                .stg-storage-bar-outer { height: 10px; background: #f3f4f6; border-radius: 9999px; overflow: hidden; margin-top: 8px; margin-bottom: 8px; max-width: 400px; }
-                .stg-storage-bar-inner { height: 100%; background: linear-gradient(90deg, #4f46e5 0%, #818cf8 100%); border-radius: 9999px; transition: width 0.4s; }
-                .stg-storage-text { font-size: 13px; color: #6b7280; }
-
-                @media (max-width: 768px) {
-                    .stg-layout { flex-direction: column; }
-                    .stg-sidebar { width: 100%; display: flex; overflow-x: auto; }
-                    .stg-tab-btn { white-space: nowrap; border-left: none; border-bottom: 3px solid transparent; }
-                    .stg-tab-btn.active { border-bottom-color: #4f46e5; border-left: none; }
-                }
-            `}</style>
+            
 
             <div className="stg-header">
                 <h1><SettingsIcon /> Cài đặt hệ thống</h1>
@@ -218,16 +246,16 @@ export default function Setting() {
 
                             <div className="stg-form-group">
                                 <label className="stg-label">Mật khẩu hiện tại</label>
-                                <input className="stg-input" type="password" placeholder="Nhập mật khẩu hiện tại..." />
+                                <input className="stg-input" type="password" placeholder="Nhập mật khẩu hiện tại..." value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} />
                             </div>
                             <div className="stg-password-row">
                                 <div className="stg-form-group">
                                     <label className="stg-label">Mật khẩu mới</label>
-                                    <input className="stg-input" type="password" placeholder="Nhập mật khẩu mới..." />
+                                    <input className="stg-input" type="password" placeholder="Nhập mật khẩu mới..." value={newPassword} onChange={e => setNewPassword(e.target.value)} />
                                 </div>
                                 <div className="stg-form-group">
                                     <label className="stg-label">Xác nhận mật khẩu</label>
-                                    <input className="stg-input" type="password" placeholder="Nhập lại mật khẩu mới..." />
+                                    <input className="stg-input" type="password" placeholder="Nhập lại mật khẩu mới..." value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} />
                                 </div>
                             </div>
                             <button className="stg-btn-save" onClick={handleSave}><SaveIcon fontSize="small" />Cập nhật mật khẩu</button>

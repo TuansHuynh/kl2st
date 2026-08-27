@@ -10,6 +10,8 @@ import Media from "../pages/Main/Document/Media";
 import Zip from "../pages/Main/Document/Zip";
 import Note from "../pages/Main/Document/Note";
 import Different from "../pages/Main/Document/Different";
+import Quiz from "../pages/Main/Document/Quiz";
+import Flashcards from "../pages/Main/Document/Flashcards";
 
 import TeamWork from "../pages/Main/Account/TeamWork";
 import Meeting from "../pages/Main/Account/Meeting";
@@ -27,7 +29,6 @@ import Help from "../pages/Main/Help";
 import TeamInfo from "../pages/Main/Account/TeamInfo";
 import MeetingInfo from "../pages/Main/Account/MeetingInfo";
 
-
 const routes = [
     {   path: "/",
         element: <MainLayout />,
@@ -41,6 +42,8 @@ const routes = [
             {path: "zip",       element: <Zip />},
             {path: "note",      element: <Note />},
             {path: "different", element: <Different />},
+            {path: "quiz/:docId", element: <Quiz />},
+            {path: "flashcards", element: <Flashcards />},
             
             {path: "team",      element: <TeamWork />},
             {path: "team-info", element: <TeamInfo />},

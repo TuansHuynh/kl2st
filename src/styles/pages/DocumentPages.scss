@@ -1,0 +1,86 @@
+/* Document Pages Styling (PDF, Word, Excel, Media, Zip, Note, Different) */
+
+.document-page {
+    padding: 24px;
+    box-sizing: border-box;
+
+    .document-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+
+        .header-title-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            .doc-type-icon {
+                font-size: 1.8rem;
+
+                &.pdf {
+                    color: #ef4444;
+                }
+
+                &.word {
+                    color: #3b82f6;
+                }
+
+                &.excel {
+                    color: #10b981;
+                }
+
+                &.media {
+                    color: #a855f7;
+                }
+
+                &.zip {
+                    color: #f97316;
+                }
+
+                &.note {
+                    color: #eab308;
+                }
+            }
+
+            h2 {
+                margin: 0;
+                font-size: 1.4rem;
+                font-weight: 700;
+                color: var(--text-primary);
+            }
+        }
+    }
+
+    .document-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 16px;
+        background: var(--bg-secondary);
+        padding: 10px 16px;
+        border-radius: 10px;
+        border: 1px solid var(--border-color);
+
+        .search-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            max-width: 360px;
+            background: var(--bg-primary);
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 6px 12px;
+
+            input {
+                border: none;
+                outline: none;
+                background: transparent;
+                font-size: 0.85rem;
+                width: 100%;
+            }
+        }
+    }
+}

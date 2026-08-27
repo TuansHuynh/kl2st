@@ -8,6 +8,7 @@ import EmailIcon from '@mui/icons-material/Email';
 import PhoneIcon from '@mui/icons-material/Phone';
 import ForumIcon from '@mui/icons-material/Forum';
 import StarIcon from '@mui/icons-material/Star';
+import { PreviewModal } from '../../components';
 
 
 interface FAQItem {
@@ -26,6 +27,15 @@ export default function Help() {
     const [contactName, setContactName] = useState('');
     const [contactEmail, setContactEmail] = useState('');
     const [contactMsg, setContactMsg] = useState('');
+    const [previewDoc, setPreviewDoc] = useState<{ url: string; type: string; name: string; blobType: string } | null>(null);
+
+    const handleOpenGuide = (e: React.MouseEvent, title: string) => {
+        e.preventDefault();
+        const content = `HƯỚNG DẪN SỬ DỤNG: ${title.toUpperCase()}\n\n1. Giới thiệu chung\nChào mừng bạn đến với tài liệu hướng dẫn sử dụng của hệ thống KL2StU.\n\n2. Các tính năng chính\n- Tải lên, tải xuống, quản lý tệp tin trực tuyến.\n- Tìm kiếm và xem trước (Preview) tất cả các định dạng PDF, Word, Excel, Hình ảnh...\n\n3. Hỗ trợ kỹ thuật\nVui lòng liên hệ support@company.vn hoặc Hotline 1900 1234 khi cần giải đáp.`;
+        const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        setPreviewDoc({ url, type: 'note', name: `${title}.txt`, blobType: 'text/plain' });
+    };
 
     const faqs: FAQItem[] = [
         {
@@ -92,75 +102,7 @@ export default function Help() {
 
     return (
         <div className="hlp-container">
-            <style>{`
-                .hlp-container {
-                    padding: 24px; color: #1f2937; font-family: 'Roboto', 'Inter', sans-serif;
-                    box-sizing: border-box; background-color: #f9fafb; min-height: calc(100vh - 10dvh); width: 100%;
-                }
-                .hlp-header { text-align: center; max-width: 600px; margin: 0 auto 36px auto; }
-                .hlp-header h1 { font-size: 28px; font-weight: 800; color: #111827; margin: 0 0 8px 0; display: flex; align-items: center; justify-content: center; gap: 10px; }
-                .hlp-header h1 svg { color: #f59e0b; font-size: 32px; }
-                .hlp-header p { font-size: 15px; color: #6b7280; margin: 0 0 24px 0; }
-
-                .hlp-search-box {
-                    position: relative; display: flex; align-items: center; max-width: 500px; margin: 0 auto;
-                }
-                .hlp-search-input {
-                    width: 100%; padding: 12px 16px 12px 46px; border: 1px solid #d1d5db; border-radius: 9999px;
-                    font-size: 15px; outline: none; transition: all 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.03);
-                }
-                .hlp-search-input:focus { border-color: #f59e0b; box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15); }
-                .hlp-search-icon { position: absolute; left: 16px; color: #9ca3af; font-size: 22px; display: flex; }
-
-                .hlp-main { display: grid; grid-template-columns: 1fr 320px; gap: 24px; max-width: 1200px; margin: 0 auto; }
-
-                .hlp-content-section { background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-
-                .hlp-cat-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; border-bottom: 1px solid #e5e7eb; padding-bottom: 16px; }
-                .hlp-cat-btn {
-                    padding: 8px 16px; border-radius: 20px; border: 1px solid #e5e7eb; background: white;
-                    font-size: 13px; font-weight: 600; color: #4b5563; cursor: pointer; transition: all 0.15s;
-                }
-                .hlp-cat-btn:hover { background: #f9fafb; color: #111827; }
-                .hlp-cat-btn.active { background: #fffbeb; border-color: #f59e0b; color: #b45309; }
-
-                .hlp-faq-list { display: flex; flex-direction: column; gap: 12px; }
-                .hlp-faq-item { border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; transition: border-color 0.15s; }
-                .hlp-faq-item:hover { border-color: #cbd5e1; }
-                .hlp-faq-item.expanded { border-color: #f59e0b; }
-
-                .hlp-faq-question {
-                    width: 100%; display: flex; justify-content: space-between; align-items: center;
-                    padding: 16px 20px; border: none; background: white; cursor: pointer;
-                    font-size: 14px; font-weight: 700; color: #111827; text-align: left;
-                }
-                .hlp-faq-question svg { color: #9ca3af; transition: transform 0.2s; }
-                .hlp-faq-item.expanded svg { transform: rotate(180deg); color: #f59e0b; }
-
-                .hlp-faq-answer { padding: 0 20px 16px 20px; font-size: 13px; color: #4b5563; line-height: 1.6; background: white; }
-
-                .hlp-sidebar { display: flex; flex-direction: column; gap: 20px; }
-
-                .hlp-card { background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-                .hlp-card-title { font-size: 16px; font-weight: 700; color: #111827; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px; }
-
-                .hlp-doc-link { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; color: #4b5563; font-size: 13px; text-decoration: none; transition: background 0.15s; }
-                .hlp-doc-link:hover { background: #f9fafb; color: #111827; }
-                .hlp-doc-link svg { color: #9ca3af; }
-
-                .hlp-contact-input { width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 13px; outline: none; margin-bottom: 10px; box-sizing: border-box; }
-                .hlp-contact-input:focus { border-color: #f59e0b; }
-                .hlp-contact-textarea { width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 13px; outline: none; margin-bottom: 12px; min-height: 80px; box-sizing: border-box; resize: vertical; font-family: inherit; }
-                .hlp-contact-textarea:focus { border-color: #f59e0b; }
-                .hlp-contact-btn { width: 100%; padding: 8px 12px; border: none; border-radius: 6px; background: #f59e0b; color: white; cursor: pointer; font-size: 13px; font-weight: 600; transition: background 0.15s; }
-                .hlp-contact-btn:hover { background: #d97706; }
-
-                .hlp-empty { padding: 32px; text-align: center; color: #9ca3af; font-size: 14px; }
-
-                @media (max-width: 1024px) {
-                    .hlp-main { grid-template-columns: 1fr; }
-                }
-            `}</style>
+            
 
             <div className="hlp-header">
                 <h1><HelpIcon /> Trung tâm Trợ giúp</h1>
@@ -203,10 +145,10 @@ export default function Help() {
                 <div className="hlp-sidebar">
                     <div className="hlp-card">
                         <h3 className="hlp-card-title"><DescriptionIcon /> Tài liệu hướng dẫn</h3>
-                        <a href="#" className="hlp-doc-link"><StarIcon fontSize="small" /> Hướng dẫn bắt đầu nhanh</a>
-                        <a href="#" className="hlp-doc-link"><StarIcon fontSize="small" /> Quản lý file nâng cao</a>
-                        <a href="#" className="hlp-doc-link"><StarIcon fontSize="small" /> Lịch họp & Tích hợp</a>
-                        <a href="#" className="hlp-doc-link"><StarIcon fontSize="small" /> Các phím tắt trong hệ thống</a>
+                        <a href="#" className="hlp-doc-link" onClick={(e) => handleOpenGuide(e, "Hướng dẫn bắt đầu nhanh")}><StarIcon fontSize="small" /> Hướng dẫn bắt đầu nhanh</a>
+                        <a href="#" className="hlp-doc-link" onClick={(e) => handleOpenGuide(e, "Quản lý file nâng cao")}><StarIcon fontSize="small" /> Quản lý file nâng cao</a>
+                        <a href="#" className="hlp-doc-link" onClick={(e) => handleOpenGuide(e, "Lịch họp & Tích hợp")}><StarIcon fontSize="small" /> Lịch họp & Tích hợp</a>
+                        <a href="#" className="hlp-doc-link" onClick={(e) => handleOpenGuide(e, "Các phím tắt trong hệ thống")}><StarIcon fontSize="small" /> Các phím tắt trong hệ thống</a>
                     </div>
 
                     <div className="hlp-card">
@@ -226,6 +168,15 @@ export default function Help() {
                     </div>
                 </div>
             </div>
+
+            <PreviewModal 
+                isOpen={!!previewDoc} 
+                onClose={() => {
+                    if (previewDoc) URL.revokeObjectURL(previewDoc.url);
+                    setPreviewDoc(null);
+                }} 
+                previewDoc={previewDoc} 
+            />
         </div>
     );
 }

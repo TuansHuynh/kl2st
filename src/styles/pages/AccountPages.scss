@@ -1,0 +1,58 @@
+/* Account Pages Styling (TeamWork, TeamInfo, Meeting, MeetingInfo, AccountList) */
+
+.teamwork-page,
+.team-info-page,
+.meeting-page,
+.meeting-info-page,
+.account-list-page {
+    padding: 24px;
+    box-sizing: border-box;
+
+    .page-title-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+
+        h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0;
+        }
+    }
+
+    .data-table-container {
+        background: var(--bg-secondary);
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+
+            th {
+                background: var(--bg-primary);
+                padding: 12px 16px;
+                text-align: left;
+                font-size: 0.8rem;
+                font-weight: 700;
+                color: var(--text-secondary);
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            td {
+                padding: 12px 16px;
+                font-size: 0.85rem;
+                color: #334155;
+                border-bottom: 1px solid var(--bg-tertiary);
+            }
+
+            tr:hover {
+                background: var(--bg-primary);
+            }
+        }
+    }
+}

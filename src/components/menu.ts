@@ -12,75 +12,80 @@ export const menuTree: MenuNode[] = [
         path: "/home"
     },
     {
+        id: "flashcards",
+        name: "Ôn tập Flashcards",
+        path: "/flashcards"
+    },
+    {
         id: "storage",
-        name: "File Storage",
+        name: "Kho lưu trữ",
         children: [
             {
                 id: "pdf",
-                name: "PDF",
+                name: "File PDF",
                 path: "/pdf",
             },
             {
                 id: "word",
-                name: "Word",
+                name: "File Word",
                 path: "/word",
             },
             {
                 id: "excel",
-                name: "Excel",
+                name: "File Excel",
                 path: "/excel",
             },
             {
                 id: "media",
-                name: "Media",
+                name: "File Media",
                 path: "/media",
             },
             {
                 id: "zip-rar",
-                name: "ZIP/RAR",
+                name: "File ZIP/RAR",
                 path: "/zip",
             },
             {
                 id: "note",
-                name: "Note",
+                name: "Ghi chú",
                 path: "/note",
             },
             {
                 id: "different",
-                name: "Different",
+                name: "File Khác",
                 path: "/different",
             },
         ]
     },
     {
         id: "group",
-        name: "Group",
+        name: "Nhóm",
         children: [
             {
                 id: "team",
-                name: "Team",
+                name: "Dnah sách Nhóm",
                 path: "/team"
             },
             {
                 id: "meeting",
-                name: "Meeting",
+                name: "Danh sách Cuộc họp",
                 path: "/meeting"
             },
         ]
     },
     {
         id: "account",
-        name: "Account",
+        name: "Quản lí tài khoản",
         path: "/account"
     },
     {
         id: "setting",
-        name: "Setting",
+        name: "Cài đặt",
         path: "/setting"
     },
     {
         id: "help",
-        name: "Help",
+        name: "Giúp đỡ",
         path: "/help"
     },
 ];

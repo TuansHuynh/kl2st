@@ -11,4 +11,34 @@
 
 @use "./components/Header.scss";
 @use "./components/Menu.scss";
-@use "./components/Pages.scss"
+@use "./components/Pages.scss";
+@use "./components/Recent.scss";
+@use "./components/Chat.scss";
+
+@use "./pages/MainLayout.scss";
+@use "./pages/AuthPages.scss";
+@use "./pages/MainPages.scss";
+@use "./pages/AccountPages.scss";
+@use "./pages/DocumentPages.scss";
+
+// Main Pages
+@use "./pages/Main/Home.scss";
+@use "./pages/Main/Setting.scss";
+@use "./pages/Main/Help.scss";
+
+// Account Pages
+@use "./pages/Account/AccountList.scss";
+@use "./pages/Account/Meeting.scss";
+@use "./pages/Account/MeetingInfo.scss";
+@use "./pages/Account/TeamWork.scss";
+@use "./pages/Account/TeamInfo.scss";
+
+// Document Pages
+@use "./pages/Document/PDF.scss";
+@use "./pages/Document/Word.scss";
+@use "./pages/Document/Excel.scss";
+@use "./pages/Document/Media.scss";
+@use "./pages/Document/Zip.scss";
+@use "./pages/Document/Note.scss";
+@use "./pages/Document/Different.scss";
+@use "./pages/Document/Quiz.scss";

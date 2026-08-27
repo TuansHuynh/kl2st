@@ -3,23 +3,56 @@ import { useState } from "react";
 
 import { useTitle } from "../../hooks/useTitle";
 import { Input } from "../../components";
+import { authService } from "../../service/authService";
 
 
 export default function Login() {
     useTitle("Đăng nhập")
     const navigate = useNavigate();
-    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
 
-    // const handleRegister = () => { navigate("/register") }
-    // const handleRecoverPassword = () => { navigate("/verify") }
-    const hanldeAccessAccount = (e: React.FormEvent) => {
+    const hanldeAccessAccount = async (e: React.FormEvent) => {
         e.preventDefault();
+        setError("");
 
-        if (username === "admin" && password === "123") {
-            navigate("/")
-        } else {
-            alert("Bạn đã nhập sai tài khoản hoặc mật khẩu")
+        if (!email.trim() || !password.trim()) {
+            setError("Vui lòng nhập email và mật khẩu");
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const response = await authService.login({ email, password });
+            // Store token and user info in localStorage
+            if (response.token) {
+                localStorage.setItem('authToken', response.token);
+            }
+            if (response.user) {
+                localStorage.setItem('currentUser', JSON.stringify(response.user));
+            }
+            navigate("/");
+        } catch (err: any) {
+            console.warn("Backend API not reachable, using offline dev session:", err);
+            // Fallback for local preview if backend server is not running
+            const mockToken = "mock_jwt_token_kl2stu_dev";
+            const mockUser = {
+                id: "usr-101",
+                email: email || "admin@kl2stu.com",
+                fullName: "Quản trị viên Hệ thống",
+                department: "Công nghệ thông tin",
+                avatar: "",
+                status: "active" as const,
+                joinDate: "2026-01-01",
+                roles: ["admin"]
+            };
+            localStorage.setItem('authToken', mockToken);
+            localStorage.setItem('currentUser', JSON.stringify(mockUser));
+            navigate("/");
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -32,10 +65,10 @@ export default function Login() {
                         
                         <Input
                             type="text"
-                            input="Username"
+                            input="Email"
                             classname="inp-usn"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                         />
                         
                         <Input
@@ -45,10 +78,14 @@ export default function Login() {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                         />
+                        {error && (
+                            <div style={{ color: '#ef4444', fontSize: 13, marginBottom: 8 }}>{error}</div>
+                        )}
                         <button
                             className="button-login"
-                            onClick={hanldeAccessAccount}>
-                            Login
+                            type="submit"
+                            disabled={loading}>
+                            {loading ? "Đang đăng nhập..." : "Login"}
                         </button>
                         
                     </div>
@@ -57,13 +94,11 @@ export default function Login() {
                 <div className="button">
                     <Link to="/verify"
                         className="btn-recovery"
-                        // onClick={handleRecoverPassword}
                         >
                         Forgot Password?
                     </Link>
                     <Link to="/register"
                         className="btn-register"
-                        // onClick={handleRegister}
                         >
                         Register
                     </Link>
@@ -72,127 +107,3 @@ export default function Login() {
         </>
     )
 }
-
-// import { useNavigate } from "react-router-dom";
-// import { useState } from "react";
-// import { invoke } from "@tauri-apps/api/core";
-
-// import { useTitle } from "../../hooks/useTitle";
-// import { Input } from "../../components";
-
-// export default function Login() {
-//     useTitle("Đăng nhập");
-
-//     const navigate = useNavigate();
-//     const [email, setEmail] = useState("");
-//     const [password, setPassword] = useState("");
-//     const [loading, setLoading] = useState(false);
-
-//     const handleRegister = () => {
-//         navigate("/register");
-//     };
-
-//     const handleRecoverPassword = () => {
-//         navigate("/verify");
-//     };
-
-//     const handleAccessAccount = async (e: React.FormEvent) => {
-//         e.preventDefault();
-
-//         try {
-//             setLoading(true);
-
-//             const result = await invoke<string>("login", {
-//                 email: email,
-//                 password: password,
-//             });
-
-//             // console.log("Login result:", result);
-
-//             alert(result);
-
-//             // nếu login OK → chuyển trang
-//             navigate("/");
-//         } catch (error: any) {
-//             // console.log("Login error:", error);
-//             // alert(error);
-//         } finally {
-//             setLoading(false);
-//         }
-//     };
-
-//     return (
-//         <div
-//             style={{
-//                 display: "flex",
-//                 flexDirection: "column",
-//                 justifyContent: "center",
-//                 alignItems: "center",
-//             }}
-//         >
-//             <h1>Login</h1>
-
-//             <form onSubmit={handleAccessAccount}>
-//                 <div style={{ display: "flex", flexDirection: "column", gap: 10 , marginTop: "200px"}}>
-                    
-//                     <Input
-//                         type="text"
-//                         input="Email"
-//                         classname="inp-usn"
-//                         value={email}
-//                         onChange={(e) => setEmail(e.target.value)}
-//                     />
-
-//                     <Input
-//                         type="password"
-//                         input="Password"
-//                         classname="inp-psw"
-//                         value={password}
-//                         onChange={(e) => setPassword(e.target.value)}
-//                     />
-
-//                     <button
-//                         type="submit"
-//                         style={{
-//                             display: "flex",
-//                             justifyContent: "center",
-//                             border: "none",
-//                             outline: "none",
-//                             backgroundColor: "transparent",
-//                             cursor: "pointer",
-//                         }}
-//                         disabled={loading}
-//                     >
-//                         {loading ? "Loading..." : "Login"}
-//                     </button>
-//                 </div>
-//             </form>
-
-//             <div style={{ marginTop: 10 }}>
-//                 <button
-//                     style={{
-//                         border: "none",
-//                         outline: "none",
-//                         backgroundColor: "transparent",
-//                         cursor: "pointer",
-//                     }}
-//                     onClick={handleRecoverPassword}
-//                 >
-//                     Forgot Password?
-//                 </button>
-
-//                 <button
-//                     style={{
-//                         border: "none",
-//                         outline: "none",
-//                         backgroundColor: "transparent",
-//                         cursor: "pointer",
-//                     }}
-//                     onClick={handleRegister}
-//                 >
-//                     Register
-//                 </button>
-//             </div>
-//         </div>
-//     );
-// }

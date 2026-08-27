@@ -11,6 +11,9 @@ import GroupIcon from '@mui/icons-material/Group';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ScheduleIcon from '@mui/icons-material/Schedule';
+import EditIcon from '@mui/icons-material/Edit';
+import { meetingService } from '../../../service/meetingService';
+import type { Meeting as BackendMeeting } from '../../../types';
 
 interface MeetingItem {
     id: string;
@@ -25,34 +28,49 @@ interface MeetingItem {
     type: 'video' | 'inperson' | 'hybrid';
     room: string;
     link?: string;
+    coOrganizers: string[];
 }
 
-const initialMeetings: MeetingItem[] = [
-    { id: '1', title: 'Sprint Review - Sprint 24', description: 'Review kết quả Sprint 24, demo sản phẩm cho stakeholders', date: '2026-07-09', time: '09:00', duration: '1h30m', organizer: 'Nguyễn Văn A', participants: ['Nguyễn Văn A', 'Lê Văn C', 'Phạm Văn D', 'Trần Thị B'], status: 'upcoming', type: 'video', room: 'Google Meet', link: 'https://meet.google.com/abc-defg-hij' },
-    { id: '2', title: 'Họp ban giám đốc Q3', description: 'Thảo luận kế hoạch kinh doanh Q3-2026', date: '2026-07-10', time: '14:00', duration: '2h', organizer: 'Nguyễn Văn A', participants: ['Nguyễn Văn A', 'Trần Thị B', 'Hoàng Văn E'], status: 'upcoming', type: 'inperson', room: 'Phòng họp A3' },
-    { id: '3', title: 'Design Review UI/UX', description: 'Review thiết kế giao diện cho module quản lý tài liệu', date: '2026-07-08', time: '10:00', duration: '1h', organizer: 'Phạm Văn D', participants: ['Phạm Văn D', 'Lê Văn C', 'Bùi Thị H'], status: 'completed', type: 'video', room: 'Zoom', link: 'https://zoom.us/j/9876543210' },
-    { id: '4', title: 'Daily Standup - Dev Team', description: 'Cập nhật tiến độ công việc hàng ngày', date: '2026-07-08', time: '08:30', duration: '15m', organizer: 'Lê Văn C', participants: ['Lê Văn C', 'Phạm Văn D', 'Vũ Minh G', 'Cao Văn I'], status: 'completed', type: 'video', room: 'Google Meet', link: 'https://meet.google.com/xyz-pdqr-lmn' },
-    { id: '5', title: 'Workshop: React Performance', description: 'Workshop chia sẻ kinh nghiệm tối ưu hiệu suất React', date: '2026-07-11', time: '15:00', duration: '2h', organizer: 'Lê Văn C', participants: ['Lê Văn C', 'Phạm Văn D', 'Vũ Minh G', 'Cao Văn I', 'Bùi Thị H', 'Nguyễn Văn A'], status: 'upcoming', type: 'hybrid', room: 'Phòng họp B1 + Zoom', link: 'https://zoom.us/j/1122334455' },
-    { id: '6', title: 'Phỏng vấn ứng viên Frontend', description: 'Phỏng vấn vòng 2 cho vị trí Frontend Developer', date: '2026-07-07', time: '14:00', duration: '1h', organizer: 'Đỗ Thị F', participants: ['Đỗ Thị F', 'Lê Văn C'], status: 'completed', type: 'inperson', room: 'Phòng họp A1' },
-    { id: '7', title: 'Họp Marketing Campaign', description: 'Lên kế hoạch chiến dịch marketing tháng 8', date: '2026-07-12', time: '10:00', duration: '1h30m', organizer: 'Trần Thị B', participants: ['Trần Thị B', 'Hoàng Văn E', 'Cao Văn I'], status: 'upcoming', type: 'video', room: 'Google Meet', link: 'https://meet.google.com/mkt-camp-2026' },
-    { id: '8', title: 'Retrospective Sprint 23', description: 'Đánh giá và cải tiến quy trình làm việc', date: '2026-07-06', time: '16:00', duration: '1h', organizer: 'Nguyễn Văn A', participants: ['Nguyễn Văn A', 'Lê Văn C', 'Phạm Văn D'], status: 'cancelled', type: 'video', room: 'Google Meet', link: 'https://meet.google.com/retro-s23' },
-];
+const mapMeetingToItem = (m: BackendMeeting): MeetingItem => ({
+    id: m.id,
+    title: m.title,
+    description: m.description || '',
+    date: m.meetingDate || '',
+    time: m.meetingTime ? m.meetingTime.slice(0, 5) : '',
+    duration: m.duration || '',
+    organizer: m.organizerName || '',
+    participants: m.participants?.map(p => p.fullName) || [],
+    status: m.status,
+    type: m.type,
+    room: m.room || '',
+    link: m.link || undefined,
+    coOrganizers: m.coOrganizers?.map(c => c.fullName) || [],
+});
 
 export default function Meeting() {
     useTitle("Cuộc họp");
     const navigate = useNavigate();
 
-    const [meetings, setMeetings] = useState<MeetingItem[]>(() => {
-        const saved = localStorage.getItem('meetings');
-        return saved ? JSON.parse(saved) : initialMeetings;
-    });
+    const [meetings, setMeetings] = useState<MeetingItem[]>([]);
+    const [loading, setLoading] = useState(true);
 
     const [searchQuery, setSearchQuery] = useState('');
     const [filterStatus, setFilterStatus] = useState('all');
     
-    // Add Meeting Form States
+    // Add/Edit Meeting Form States
     const [showAddModal, setShowAddModal] = useState(false);
+    const [editMeetingId, setEditMeetingId] = useState<string | null>(null);
     const [newTitle, setNewTitle] = useState('');
+    
+    const currentUserName = useMemo(() => {
+        const stored = localStorage.getItem('currentUser');
+        if (stored) {
+            try {
+                return JSON.parse(stored)?.fullName || '';
+            } catch { return ''; }
+        }
+        return '';
+    }, []);
     const [newDesc, setNewDesc] = useState('');
     const [newDate, setNewDate] = useState('');
     const [newTime, setNewTime] = useState('');
@@ -61,15 +79,29 @@ export default function Meeting() {
     const [newRoom, setNewRoom] = useState('Google Meet');
     const [newLink, setNewLink] = useState('');
 
-    // Persist to localStorage
+    // Fetch meetings on mount
     useEffect(() => {
-        localStorage.setItem('meetings', JSON.stringify(meetings));
-    }, [meetings]);
+        const fetchMeetings = async () => {
+            try {
+                setLoading(true);
+                const data = await meetingService.getAllMeetings();
+                setMeetings(data.map(mapMeetingToItem));
+            } catch (err) {
+                console.error('Failed to fetch meetings:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchMeetings();
+    }, []);
 
     const totalMeetings = meetings.length;
     const upcomingCount = useMemo(() => meetings.filter(m => m.status === 'upcoming').length, [meetings]);
     const completedCount = useMemo(() => meetings.filter(m => m.status === 'completed').length, [meetings]);
-    const todayCount = useMemo(() => meetings.filter(m => m.date === '2026-07-08').length, [meetings]);
+    const todayCount = useMemo(() => {
+        const todayStr = new Date().toISOString().split('T')[0];
+        return meetings.filter(m => m.date === todayStr).length;
+    }, [meetings]);
 
     const filteredMeetings = useMemo(() => {
         let result = meetings.filter(m => {
@@ -89,32 +121,21 @@ export default function Meeting() {
         return result;
     }, [meetings, searchQuery, filterStatus]);
 
-    const handleDelete = (id: string, e: React.MouseEvent) => {
+    const handleDelete = async (id: string, e: React.MouseEvent) => {
         e.stopPropagation();
         if (window.confirm('Bạn có chắc chắn muốn xóa cuộc họp này?')) {
-            setMeetings(prev => prev.filter(m => m.id !== id));
+            try {
+                await meetingService.deleteMeeting(id);
+                setMeetings(prev => prev.filter(m => m.id !== id));
+            } catch (err) {
+                console.error('Failed to delete meeting:', err);
+                alert('Xóa cuộc họp thất bại!');
+            }
         }
     };
 
-    const handleAddMeeting = () => {
-        if (!newTitle.trim()) return;
-        const newMeeting: MeetingItem = {
-            id: Date.now().toString(),
-            title: newTitle,
-            description: newDesc || 'Cuộc họp mới',
-            date: newDate || '2026-07-09',
-            time: newTime || '10:00',
-            duration: newDuration,
-            organizer: 'Tunas',
-            participants: ['Tunas'],
-            status: 'upcoming',
-            type: newType,
-            room: newRoom,
-            link: (newType === 'video' || newType === 'hybrid') && newLink.trim() ? newLink.trim() : undefined
-        };
-        setMeetings(prev => [newMeeting, ...prev]);
-        
-        // Reset form
+    const handleOpenAdd = () => {
+        setEditMeetingId(null);
         setNewTitle('');
         setNewDesc('');
         setNewDate('');
@@ -123,8 +144,61 @@ export default function Meeting() {
         setNewType('video');
         setNewRoom('Google Meet');
         setNewLink('');
-        
-        setShowAddModal(false);
+        setShowAddModal(true);
+    };
+
+    const handleOpenEdit = (m: MeetingItem, e: React.MouseEvent) => {
+        e.stopPropagation();
+        setEditMeetingId(m.id);
+        setNewTitle(m.title);
+        setNewDesc(m.description);
+        setNewDate(m.date);
+        setNewTime(m.time);
+        setNewDuration(m.duration);
+        setNewType(m.type);
+        setNewRoom(m.room);
+        setNewLink(m.link || '');
+        setShowAddModal(true);
+    };
+
+    const handleSaveMeeting = async () => {
+        if (!newTitle.trim()) return;
+        try {
+            const payload = {
+                title: newTitle,
+                description: newDesc,
+                meetingDate: newDate || new Date().toISOString().split('T')[0],
+                meetingTime: newTime ? (newTime.length === 5 ? `${newTime}:00` : newTime) : '10:00:00',
+                duration: newDuration,
+                type: newType,
+                room: newRoom,
+                link: (newType === 'video' || newType === 'hybrid') && newLink.trim() ? newLink.trim() : undefined
+            };
+
+            if (editMeetingId) {
+                const updated = await meetingService.updateMeeting(editMeetingId, payload);
+                setMeetings(prev => prev.map(m => m.id === editMeetingId ? mapMeetingToItem(updated) : m));
+            } else {
+                const created = await meetingService.createMeeting(payload);
+                setMeetings(prev => [mapMeetingToItem(created), ...prev]);
+            }
+            
+            // Reset form
+            setNewTitle('');
+            setNewDesc('');
+            setNewDate('');
+            setNewTime('');
+            setNewDuration('1h');
+            setNewType('video');
+            setNewRoom('Google Meet');
+            setNewLink('');
+            
+            setShowAddModal(false);
+            setEditMeetingId(null);
+        } catch (err) {
+            console.error('Failed to save meeting:', err);
+            alert('Lưu cuộc họp thất bại!');
+        }
     };
 
     const handleCardClick = (id: string) => {
@@ -153,132 +227,14 @@ export default function Meeting() {
 
     return (
         <div className="mt-container">
-            <style>{`
-                .mt-container {
-                    padding: 24px; color: #1f2937; font-family: 'Roboto', 'Inter', sans-serif;
-                    box-sizing: border-box; background-color: #f9fafb; min-height: calc(100vh - 10dvh); width: 100%;
-                }
-                .mt-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-                .mt-title-wrap h1 { font-size: 24px; font-weight: 700; color: #111827; margin: 0 0 4px 0; display: flex; align-items: center; gap: 10px; }
-                .mt-title-wrap h1 svg { color: #3b82f6; font-size: 28px; }
-                .mt-title-wrap p { font-size: 14px; color: #6b7280; margin: 0; }
-
-                .mt-btn-add {
-                    display: flex; align-items: center; gap: 8px;
-                    background-color: #3b82f6; color: white; border: none; border-radius: 8px;
-                    padding: 10px 16px; font-size: 14px; font-weight: 600; cursor: pointer;
-                    transition: all 0.2s ease;
-                    box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2);
-                }
-                .mt-btn-add:hover { background-color: #2563eb; transform: translateY(-1px); }
-
-                .mt-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
-                .mt-stat-card {
-                    background: #ffffff; border-radius: 12px; padding: 16px;
-                    box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #e5e7eb;
-                    display: flex; align-items: center; justify-content: space-between;
-                    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-                }
-                .mt-stat-card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
-                .mt-stat-card.s1 { border-left: 4px solid #3b82f6; }
-                .mt-stat-card.s2 { border-left: 4px solid #f59e0b; }
-                .mt-stat-card.s3 { border-left: 4px solid #10b981; }
-                .mt-stat-card.s4 { border-left: 4px solid #8b5cf6; }
-
-                .mt-card-data { display: flex; flex-direction: column; }
-                .mt-card-title { font-size: 12px; color: #6b7280; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
-                .mt-card-value { font-size: 24px; font-weight: 700; color: #111827; }
-                .mt-card-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
-                .s1 .mt-card-icon { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
-                .s2 .mt-card-icon { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
-                .s3 .mt-card-icon { background: rgba(16, 185, 129, 0.1); color: #10b981; }
-                .s4 .mt-card-icon { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
-
-                .mt-controls-bar { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 24px; }
-                .mt-search-wrap { position: relative; display: flex; align-items: center; flex: 1; min-width: 200px; }
-                .mt-search-input { padding: 8px 12px 8px 36px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; outline: none; transition: all 0.2s; width: 100%; }
-                .mt-search-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); }
-                .mt-search-icon { position: absolute; left: 10px; color: #9ca3af; font-size: 20px; display: flex; align-items: center; }
-                .mt-filter-select { padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; background: white; color: #4b5563; outline: none; cursor: pointer; }
-
-                .mt-meetings-list { display: flex; flex-direction: column; gap: 12px; }
-                .mt-meeting-card {
-                    background: #ffffff; border-radius: 12px; border: 1px solid #e5e7eb;
-                    box-shadow: 0 1px 3px rgba(0,0,0,0.05); padding: 20px;
-                    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-                    display: flex; gap: 20px; align-items: flex-start;
-                    cursor: pointer;
-                }
-                .mt-meeting-card:hover { transform: translateY(-2px); box-shadow: 0 8px 15px -3px rgba(0,0,0,0.08); }
-
-                .mt-meeting-time-block {
-                    min-width: 80px; text-align: center; padding: 12px 8px;
-                    background: #f9fafb; border-radius: 10px; flex-shrink: 0;
-                }
-                .mt-meeting-date { font-size: 12px; color: #6b7280; font-weight: 500; margin-bottom: 4px; }
-                .mt-meeting-time { font-size: 20px; font-weight: 700; color: #111827; }
-                .mt-meeting-dur { font-size: 11px; color: #9ca3af; margin-top: 2px; }
-
-                .mt-meeting-content { flex: 1; }
-                .mt-meeting-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; gap: 8px; }
-                .mt-meeting-title { font-size: 16px; font-weight: 700; color: #111827; margin: 0; }
-                .mt-meeting-badges { display: flex; gap: 6px; flex-shrink: 0; }
-                .mt-meeting-desc { font-size: 13px; color: #6b7280; margin-bottom: 12px; line-height: 1.5; }
-
-                .mt-meeting-meta { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; }
-                .mt-meta-item { display: flex; align-items: center; gap: 4px; font-size: 12px; color: #6b7280; }
-                .mt-meta-item svg { font-size: 15px; color: #9ca3af; }
-
-                .mt-meeting-participants { display: flex; align-items: center; gap: 6px; }
-                .mt-participant-avatars { display: flex; }
-                .mt-participant-avatar {
-                    width: 26px; height: 26px; border-radius: 50%; border: 2px solid white;
-                    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-                    color: white; font-size: 10px; font-weight: 700;
-                    display: flex; align-items: center; justify-content: center;
-                    margin-left: -6px;
-                }
-                .mt-participant-avatar:first-child { margin-left: 0; }
-                .mt-participant-more { font-size: 11px; color: #9ca3af; }
-
-                .mt-meeting-actions { display: flex; gap: 4px; align-items: flex-start; flex-shrink: 0; }
-                .mt-btn-action { background: transparent; border: none; cursor: pointer; padding: 6px; border-radius: 6px; color: #9ca3af; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
-                .mt-btn-action:hover { background-color: #f3f4f6; color: #111827; }
-                .mt-btn-action.btn-del:hover { background-color: #fee2e2; color: #ef4444; }
-
-                .mt-empty { padding: 48px; text-align: center; color: #9ca3af; font-size: 15px; }
-
-                /* Modals */
-                .mt-modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px); }
-                .mt-modal { background: white; border-radius: 16px; padding: 24px; width: 90%; max-width: 500px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); overflow-y: auto; max-height: 90vh; }
-                .mt-modal h2 { font-size: 18px; font-weight: 700; margin: 0 0 16px 0; color: #111827; }
-                .mt-modal-label { display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 4px; }
-                .mt-modal-input { width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; outline: none; margin-bottom: 12px; box-sizing: border-box; }
-                .mt-modal-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); }
-                .mt-modal-select { width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; outline: none; margin-bottom: 12px; box-sizing: border-box; background: white; cursor: pointer; }
-                .mt-modal-select:focus { border-color: #3b82f6; }
-                .mt-modal-textarea { width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; outline: none; margin-bottom: 12px; min-height: 80px; resize: vertical; box-sizing: border-box; font-family: inherit; }
-                .mt-modal-textarea:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); }
-                .mt-modal-row { display: flex; gap: 12px; }
-                .mt-modal-row > * { flex: 1; }
-                .mt-modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 4px; }
-                .mt-modal-btn-cancel { padding: 8px 16px; border: 1px solid #d1d5db; border-radius: 8px; background: white; color: #4b5563; cursor: pointer; font-size: 14px; font-weight: 500; }
-                .mt-modal-btn-cancel:hover { background: #f3f4f6; }
-                .mt-modal-btn-save { padding: 8px 16px; border: none; border-radius: 8px; background: #3b82f6; color: white; cursor: pointer; font-size: 14px; font-weight: 600; }
-                .mt-modal-btn-save:hover { background: #2563eb; }
-
-                @media (max-width: 640px) {
-                    .mt-meeting-card { flex-direction: column; }
-                    .mt-meeting-time-block { min-width: auto; width: 100%; }
-                }
-            `}</style>
+            
 
             <div className="mt-header">
                 <div className="mt-title-wrap">
                     <h1><VideocamIcon /> Quản lý Cuộc họp</h1>
                     <p>Lên lịch, theo dõi và quản lý các cuộc họp trong tổ chức</p>
                 </div>
-                <button className="mt-btn-add" onClick={() => setShowAddModal(true)}>
+                <button className="mt-btn-add" onClick={handleOpenAdd}>
                     <AddIcon fontSize="small" />
                     Tạo cuộc họp
                 </button>
@@ -355,11 +311,18 @@ export default function Meeting() {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="mt-meeting-actions">
-                                    <button className="mt-btn-action btn-del" title="Xóa" onClick={(e) => handleDelete(meeting.id, e)}>
-                                        <DeleteIcon style={{ fontSize: 18 }} />
-                                    </button>
-                                </div>
+                                {(meeting.organizer === currentUserName || meeting.coOrganizers.includes(currentUserName)) && (
+                                    <div className="mt-meeting-actions">
+                                        <button className="mt-btn-action btn-edit" title="Sửa" onClick={(e) => handleOpenEdit(meeting, e)}>
+                                            <EditIcon style={{ fontSize: 18 }} />
+                                        </button>
+                                        {meeting.organizer === currentUserName && (
+                                            <button className="mt-btn-action btn-del" title="Xóa" onClick={(e) => handleDelete(meeting.id, e)}>
+                                                <DeleteIcon style={{ fontSize: 18 }} />
+                                            </button>
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         );
                     })}
@@ -369,9 +332,9 @@ export default function Meeting() {
             )}
 
             {showAddModal && (
-                <div className="mt-modal-overlay" onClick={() => setShowAddModal(false)}>
+                <div className="mt-modal-overlay" onClick={() => { setShowAddModal(false); setEditMeetingId(null); }}>
                     <div className="mt-modal" onClick={e => e.stopPropagation()}>
-                        <h2>Tạo cuộc họp mới</h2>
+                        <h2>{editMeetingId ? 'Sửa cuộc họp' : 'Tạo cuộc họp mới'}</h2>
                         
                         <label className="mt-modal-label">Tiêu đề cuộc họp</label>
                         <input className="mt-modal-input" placeholder="Nhập tiêu đề..." value={newTitle} onChange={e => setNewTitle(e.target.value)} />
@@ -416,8 +379,8 @@ export default function Meeting() {
                         )}
 
                         <div className="mt-modal-actions">
-                            <button className="mt-modal-btn-cancel" onClick={() => setShowAddModal(false)}>Hủy</button>
-                            <button className="mt-modal-btn-save" onClick={handleAddMeeting}>Tạo cuộc họp</button>
+                            <button className="mt-modal-btn-cancel" onClick={() => { setShowAddModal(false); setEditMeetingId(null); }}>Hủy</button>
+                            <button className="mt-modal-btn-save" onClick={handleSaveMeeting}>{editMeetingId ? 'Lưu thay đổi' : 'Tạo cuộc họp'}</button>
                         </div>
                     </div>
                 </div>

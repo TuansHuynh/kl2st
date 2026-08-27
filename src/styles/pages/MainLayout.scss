@@ -1,0 +1,144 @@
+/* Main Layout Styles */
+
+.main-layout {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+
+    .main {
+        display: flex;
+        justify-content: space-between;
+        flex: 1;
+        overflow: hidden;
+        position: relative;
+
+        .menu-wrapper {
+            position: relative;
+            display: flex;
+            flex-shrink: 0;
+            width: 25dvh;
+            min-width: 200px;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 10;
+
+            .menu-inner {
+                width: 25dvh;
+                min-width: 200px;
+                overflow: hidden;
+                transition: opacity 0.2s;
+            }
+
+            &.collapsed {
+                width: 0;
+                min-width: 0;
+
+                .menu-inner {
+                    opacity: 0;
+                    pointer-events: none;
+                }
+
+                .toggle-menu {
+                    right: -24px;
+                }
+            }
+
+            .toggle-menu {
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                right: -24px;
+                width: 24px;
+                height: 48px;
+                border-radius: 12px;
+                background: var(--bg-secondary);
+                border: 1px solid var(--border-color);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                color: var(--text-muted);
+                z-index: 20;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+                &:hover {
+                    color: var(--text-primary);
+                    background: var(--bg-primary);
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                    transform: translateY(-50%) scale(1.05);
+                }
+            }
+        }
+
+        .link-outlet {
+            flex: 1;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .sidebar-wrapper {
+            position: relative;
+            display: flex;
+            flex-shrink: 0;
+            width: 340px;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 10;
+
+            .sidebar-inner {
+                width: 340px;
+                overflow: hidden;
+                transition: opacity 0.2s;
+            }
+
+            .recent-sidebar {
+                width: 340px;
+                min-width: 340px;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+            }
+
+            &.collapsed {
+                width: 0;
+
+                .sidebar-inner {
+                    opacity: 0;
+                    pointer-events: none;
+                }
+
+                .toggle-sidebar {
+                    left: -24px;
+                }
+            }
+
+            .toggle-sidebar {
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                left: -24px;
+                width: 24px;
+                height: 48px;
+                border-radius: 12px;
+                background: var(--bg-secondary);
+                border: 1px solid var(--border-color);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                color: var(--text-muted);
+                z-index: 20;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+                &:hover {
+                    color: var(--text-primary);
+                    background: var(--bg-primary);
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                    transform: translateY(-50%) scale(1.05);
+                }
+            }
+        }
+    }
+}

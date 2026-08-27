@@ -1,0 +1,53 @@
+/* Main Pages Styling (Home, Setting, Help) */
+
+.home-page,
+.setting-page,
+.help-page {
+    padding: 24px;
+    box-sizing: border-box;
+
+    .page-header {
+        margin-bottom: 24px;
+
+        h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0 0 6px 0;
+        }
+
+        p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+
+        .stat-card {
+            background: var(--bg-secondary);
+            padding: 16px 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+
+            .stat-title {
+                font-size: 0.8rem;
+                color: var(--text-muted);
+                font-weight: 600;
+            }
+
+            .stat-value {
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: #1e293b;
+                margin-top: 4px;
+            }
+        }
+    }
+}

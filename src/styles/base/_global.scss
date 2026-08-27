@@ -10,4 +10,48 @@ $text-muted: #4b5563;
 $bg-color: #f9fafb;
 $white: #ffffff;
 
-// 
+:root {
+    --bg-primary: #f9fafb;
+    --bg-secondary: #ffffff;
+    --bg-tertiary: #f1f5f9;
+    --bg-hover: #f3f4f6;
+
+    --text-primary: #111827;
+    --text-secondary: #4b5563;
+    --text-muted: #6b7280;
+
+    --border-color: #e5e7eb;
+    --border-hover: #d1d5db;
+}
+
+body.dark-theme {
+    --bg-primary: #121212;
+    --bg-secondary: #1e1e1e;
+    --bg-tertiary: #2d2d2d;
+    --bg-hover: #3a3a3a;
+
+    --text-primary: #f3f4f6;
+    --text-secondary: #d1d5db;
+    --text-muted: #9ca3af;
+
+    --border-color: #404040;
+    --border-hover: #525252;
+    
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+// Global themes
+html:has(body.dark-theme) {
+    background-color: var(--bg-primary);
+}
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+// Compact view overrides
+body.compact-view {
+    zoom: 0.9;
+}

@@ -9,6 +9,9 @@ import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PersonIcon from '@mui/icons-material/Person';
+import { teamService } from '../../../service/teamService';
+import { accountService } from '../../../service/accountService';
+import type { Team, User } from '../../../types';
 
 interface TeamItem {
     id: string;
@@ -23,20 +26,18 @@ interface TeamItem {
     members: string[];
 }
 
-const ALL_SYSTEM_MEMBERS = [
-    'Nguyễn Văn A', 'Trần Thị B', 'Lê Văn C', 'Phạm Văn D',
-    'Hoàng Văn E', 'Đỗ Thị F', 'Vũ Minh G', 'Bùi Thị H',
-    'Cao Văn I', 'Đinh Thị K', 'Tunas'
-];
-
-const initialTeams: TeamItem[] = [
-    { id: '1', name: 'Frontend Team', description: 'Phát triển giao diện người dùng, React & TypeScript', leader: 'Nguyễn Văn A', memberCount: 6, projectCount: 4, status: 'active', createdDate: '2025-01-15', color: '#4f46e5', members: ['Nguyễn Văn A', 'Lê Văn C', 'Phạm Văn D', 'Vũ Minh G', 'Bùi Thị H', 'Cao Văn I'] },
-    { id: '2', name: 'Backend Team', description: 'API, Database & Server infrastructure', leader: 'Lê Văn C', memberCount: 5, projectCount: 3, status: 'active', createdDate: '2025-01-15', color: '#10b981', members: ['Lê Văn C', 'Nguyễn Văn A', 'Hoàng Văn E', 'Đỗ Thị F', 'Cao Văn I'] },
-    { id: '3', name: 'Design Team', description: 'UI/UX Design, Branding & Creative', leader: 'Phạm Văn D', memberCount: 4, projectCount: 5, status: 'active', createdDate: '2025-03-01', color: '#8b5cf6', members: ['Phạm Văn D', 'Trần Thị B', 'Bùi Thị H', 'Đinh Thị K'] },
-    { id: '4', name: 'Marketing Team', description: 'Chiến lược Marketing, SEO & Content', leader: 'Trần Thị B', memberCount: 4, projectCount: 2, status: 'active', createdDate: '2025-04-10', color: '#f59e0b', members: ['Trần Thị B', 'Hoàng Văn E', 'Cao Văn I', 'Đinh Thị K'] },
-    { id: '5', name: 'QA Team', description: 'Kiểm thử chất lượng phần mềm', leader: 'Hoàng Văn E', memberCount: 3, projectCount: 2, status: 'active', createdDate: '2025-06-01', color: '#06b6d4', members: ['Hoàng Văn E', 'Đỗ Thị F', 'Vũ Minh G'] },
-    { id: '6', name: 'HR & Admin', description: 'Quản lý nhân sự và hành chính', leader: 'Đỗ Thị F', memberCount: 3, projectCount: 1, status: 'archived', createdDate: '2025-08-15', color: '#ef4444', members: ['Đỗ Thị F', 'Đinh Thị K', 'Bùi Thị H'] },
-];
+const mapTeamToItem = (t: Team): TeamItem => ({
+    id: t.id,
+    name: t.name,
+    description: t.description || '',
+    leader: t.leaderName || '',
+    memberCount: t.members?.length || 0,
+    projectCount: t.projectCount || 0,
+    status: t.status,
+    createdDate: t.createdDate || '',
+    color: t.color || '#4f46e5',
+    members: t.members?.map(m => m.fullName) || [],
+});
 
 export default function TeamInfo() {
     useTitle("Chi tiết Nhóm");
@@ -44,24 +45,54 @@ export default function TeamInfo() {
     const [searchParams] = useSearchParams();
     const teamId = searchParams.get('id');
 
-    const [teams, setTeams] = useState<TeamItem[]>(() => {
-        const saved = localStorage.getItem('teams');
-        return saved ? JSON.parse(saved) : initialTeams;
-    });
+    const [selectedTeam, setSelectedTeam] = useState<TeamItem | null>(null);
+    const [systemUsers, setSystemUsers] = useState<User[]>([]);
+    const [loading, setLoading] = useState(true);
 
     const [newMemberName, setNewMemberName] = useState('');
     const [showSuggestions, setShowSuggestions] = useState(false);
-    const currentUserName = 'Tunas';
+    const currentUserName = useMemo(() => {
+        const stored = localStorage.getItem('currentUser');
+        if (stored) {
+            try {
+                const u = JSON.parse(stored);
+                return u.fullName || 'Nguyễn Văn A';
+            } catch {
+                return 'Nguyễn Văn A';
+            }
+        }
+        return 'Nguyễn Văn A';
+    }, []);
 
-    const selectedTeam = useMemo(() => {
-        return teams.find(t => t.id === teamId) || null;
-    }, [teams, teamId]);
+    // Fetch team details and all system users
+    useEffect(() => {
+        if (!teamId) return;
+        const loadData = async () => {
+            try {
+                setLoading(true);
+                const team = await teamService.getTeamById(teamId);
+                setSelectedTeam(mapTeamToItem(team));
+
+                const users = await accountService.getAllAccounts();
+                setSystemUsers(users);
+            } catch (err) {
+                console.error('Failed to load team info:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadData();
+    }, [teamId]);
+
+    const ALL_SYSTEM_MEMBERS = useMemo(() => {
+        return systemUsers.map(u => u.fullName);
+    }, [systemUsers]);
 
     // Members available to add (not already in team)
     const availableMembers = useMemo(() => {
         if (!selectedTeam) return [];
         return ALL_SYSTEM_MEMBERS.filter(m => !selectedTeam.members.includes(m));
-    }, [selectedTeam]);
+    }, [selectedTeam, ALL_SYSTEM_MEMBERS]);
 
     // Filtered suggestions based on input
     const filteredSuggestions = useMemo(() => {
@@ -71,55 +102,67 @@ export default function TeamInfo() {
         );
     }, [newMemberName, availableMembers]);
 
-    useEffect(() => {
-        localStorage.setItem('teams', JSON.stringify(teams));
-    }, [teams]);
-
-    const handleJoinTeam = () => {
-        if (!selectedTeam) return;
+    const handleJoinTeam = async () => {
+        if (!selectedTeam || !teamId) return;
         if (selectedTeam.members.includes(currentUserName)) {
             alert('Bạn đã là thành viên của nhóm này rồi!');
             return;
         }
-        setTeams(prev => prev.map(t => {
-            if (t.id !== selectedTeam.id) return t;
-            const updatedMembers = [...t.members, currentUserName];
-            return { ...t, members: updatedMembers, memberCount: updatedMembers.length };
-        }));
-        alert(`Bạn đã tham gia nhóm "${selectedTeam.name}" thành công!`);
+        // Find current user's id
+        const user = systemUsers.find(u => u.fullName === currentUserName);
+        if (!user) return;
+        try {
+            const updated = await teamService.addMember(teamId, user.id);
+            setSelectedTeam(mapTeamToItem(updated));
+            alert(`Bạn đã tham gia nhóm "${selectedTeam.name}" thành công!`);
+        } catch (err) {
+            console.error(err);
+            alert('Tham gia nhóm thất bại!');
+        }
     };
 
-    const handleAddMember = (name?: string) => {
+    const handleAddMember = async (name?: string) => {
         const memberName = (name || newMemberName).trim();
-        if (!selectedTeam || !memberName) return;
+        if (!selectedTeam || !memberName || !teamId) return;
         if (selectedTeam.members.includes(memberName)) {
             alert('Thành viên này đã tồn tại trong nhóm!');
             return;
         }
-        setTeams(prev => prev.map(t => {
-            if (t.id !== selectedTeam.id) return t;
-            const updatedMembers = [...t.members, memberName];
-            return { ...t, members: updatedMembers, memberCount: updatedMembers.length };
-        }));
-        setNewMemberName('');
-        setShowSuggestions(false);
+        const user = systemUsers.find(u => u.fullName === memberName);
+        if (!user) {
+            alert('Thành viên không tồn tại trong hệ thống!');
+            return;
+        }
+        try {
+            const updated = await teamService.addMember(teamId, user.id);
+            setSelectedTeam(mapTeamToItem(updated));
+            setNewMemberName('');
+            setShowSuggestions(false);
+        } catch (err) {
+            console.error(err);
+            alert('Thêm thành viên thất bại!');
+        }
     };
 
-    const handleRemoveMember = (memberName: string) => {
-        if (!selectedTeam) return;
+    const handleRemoveMember = async (memberName: string) => {
+        if (!selectedTeam || !teamId) return;
         if (window.confirm(`Bạn có chắc muốn xóa thành viên "${memberName}" khỏi nhóm?`)) {
-            setTeams(prev => prev.map(t => {
-                if (t.id !== selectedTeam.id) return t;
-                const updatedMembers = t.members.filter(m => m !== memberName);
-                return { ...t, members: updatedMembers, memberCount: updatedMembers.length };
-            }));
+            const user = systemUsers.find(u => u.fullName === memberName);
+            if (!user) return;
+            try {
+                const updated = await teamService.removeMember(teamId, user.id);
+                setSelectedTeam(mapTeamToItem(updated));
+            } catch (err) {
+                console.error(err);
+                alert('Xóa thành viên thất bại!');
+            }
         }
     };
 
     if (!selectedTeam) {
         return (
             <div className="twd-detail-view" style={{ padding: 24 }}>
-                <div className="twd-back-bar" style={{ cursor: 'pointer', color: '#6b7280' }} onClick={() => navigate('/team')}>
+                <div className="twd-back-bar" style={{ cursor: 'pointer', color: 'var(--text-muted)' }} onClick={() => navigate('/team')}>
                     <ArrowBackIcon style={{ fontSize: 18, marginRight: 6, verticalAlign: 'middle' }} />
                     Quay lại danh sách nhóm
                 </div>
@@ -130,63 +173,7 @@ export default function TeamInfo() {
 
     return (
         <div className="twd-detail-view" style={{ padding: 24 }}>
-            <style>{`
-                .twd-back-bar { display: flex; align-items: center; gap: 8px; color: #4b5563; font-weight: 600; font-size: 14px; cursor: pointer; margin-bottom: 20px; transition: color 0.15s; }
-                .twd-back-bar:hover { color: #10b981; }
-                .twd-detail-card { background: white; border-radius: 16px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden; margin-bottom: 24px; font-family: 'Roboto', 'Inter', sans-serif; }
-                .twd-detail-header { padding: 24px; position: relative; color: white; }
-                .twd-detail-banner-overlay { position: absolute; inset: 0; opacity: 0.85; }
-                .twd-detail-header-content { position: relative; z-index: 10; }
-                .twd-detail-title-row { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; }
-                .twd-detail-name { font-size: 24px; font-weight: 800; margin: 0 0 6px 0; }
-                .twd-detail-desc { font-size: 14px; margin: 0 0 20px 0; max-width: 700px; opacity: 0.9; line-height: 1.6; }
-                .twd-header-meta { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; opacity: 0.95; }
-                .twd-header-meta-item { display: flex; align-items: center; gap: 6px; }
-                .twd-actions-row { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
-                .twd-btn-join {
-                    display: flex; align-items: center; gap: 8px; background: white; color: #111827; border: 1px solid #d1d5db;
-                    border-radius: 8px; padding: 10px 18px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s;
-                }
-                .twd-btn-join:hover { background: #f9fafb; border-color: #cbd5e1; }
-                .twd-btn-join.joined { background: rgba(255,255,255,0.2); color: white; border-color: transparent; cursor: default; }
-                .twd-detail-body { padding: 24px; display: grid; grid-template-columns: 1fr 340px; gap: 24px; }
-                .twd-members-section h3 { font-size: 16px; font-weight: 700; color: #111827; margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px; }
-                .twd-members-list { display: flex; flex-direction: column; gap: 10px; }
-                .twd-member-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f9fafb; border-radius: 10px; border: 1px solid #f3f4f6; }
-                .twd-member-info { display: flex; align-items: center; gap: 10px; }
-                .twd-member-avatar-round { width: 32px; height: 32px; border-radius: 50%; color: white; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
-                .twd-member-name-text { font-size: 14px; font-weight: 600; color: #1f2937; }
-                .twd-member-role-label { font-size: 12px; color: #6b7280; background: #f3f4f6; padding: 2px 8px; border-radius: 8px; }
-                .twd-member-role-label.leader { background: #fffbeb; color: #b45309; font-weight: 600; }
-                .twd-add-member-card { background: #f9fafb; border-radius: 12px; border: 1px solid #e5e7eb; padding: 20px; height: fit-content; }
-                .twd-add-member-title { font-size: 14px; font-weight: 700; color: #111827; margin: 0 0 12px 0; display: flex; align-items: center; gap: 6px; }
-                .twd-add-input-wrap { display: flex; gap: 8px; position: relative; }
-                .twd-add-input { flex: 1; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 13px; outline: none; width: 100%; box-sizing: border-box; }
-                .twd-add-input:focus { border-color: #10b981; }
-                .twd-add-btn { background: #10b981; color: white; border: none; border-radius: 6px; padding: 8px 12px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.15s; flex-shrink: 0; }
-                .twd-add-btn:hover { background: #059669; }
-                .tw-btn-action { background: transparent; border: none; cursor: pointer; padding: 6px; border-radius: 6px; color: #9ca3af; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
-                .tw-btn-action:hover { background-color: #fee2e2; color: #ef4444; }
-
-                .twd-suggestions-list {
-                    position: absolute; top: 100%; left: 0; right: 56px; background: white; border: 1px solid #e5e7eb;
-                    border-radius: 8px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); max-height: 200px; overflow-y: auto; z-index: 20; margin-top: 4px;
-                }
-                .twd-suggestion-item {
-                    display: flex; align-items: center; gap: 10px; padding: 10px 14px; cursor: pointer;
-                    font-size: 13px; color: #1f2937; transition: background 0.1s; border-bottom: 1px solid #f3f4f6;
-                }
-                .twd-suggestion-item:last-child { border-bottom: none; }
-                .twd-suggestion-item:hover { background: #ecfdf5; }
-                .twd-suggestion-avatar { width: 26px; height: 26px; border-radius: 50%; background: #10b981; color: white; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-                .twd-suggestion-empty { padding: 12px 14px; font-size: 12px; color: #9ca3af; text-align: center; }
-
-                .twd-section-divider { font-size: 11px; color: #9ca3af; padding: 8px 14px 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; background: #f9fafb; }
-
-                @media (max-width: 768px) {
-                    .twd-detail-body { grid-template-columns: 1fr; }
-                }
-            `}</style>
+            
 
             <div className="twd-back-bar" onClick={() => navigate('/team')}>
                 <ArrowBackIcon style={{ fontSize: 18 }} />
@@ -199,7 +186,7 @@ export default function TeamInfo() {
                     <div className="twd-detail-header-content">
                         <div className="twd-detail-title-row">
                             <h2 className="twd-detail-name">{selectedTeam.name}</h2>
-                            <span style={{ background: selectedTeam.status === 'active' ? '#ecfdf5' : '#f3f4f6', color: selectedTeam.status === 'active' ? '#047857' : '#4b5563', padding: '4px 12px', borderRadius: 12, fontSize: 12, fontWeight: 700 }}>
+                            <span style={{ background: selectedTeam.status === 'active' ? '#ecfdf5' : 'var(--bg-hover)', color: selectedTeam.status === 'active' ? '#047857' : 'var(--text-secondary)', padding: '4px 12px', borderRadius: 12, fontSize: 12, fontWeight: 700 }}>
                                 {selectedTeam.status === 'active' ? 'Đang hoạt động' : 'Đã lưu trữ'}
                             </span>
                         </div>
@@ -254,7 +241,7 @@ export default function TeamInfo() {
 
                     <div className="twd-add-member-card">
                         <h4 className="twd-add-member-title"><PersonAddIcon style={{ fontSize: 16, color: '#10b981' }} /> Thêm thành viên mới</h4>
-                        <p style={{ fontSize: 12, color: '#6b7280', margin: '0 0 12px 0', lineHeight: 1.4 }}>Nhập tên hoặc chọn từ danh sách thành viên hệ thống.</p>
+                        <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '0 0 12px 0', lineHeight: 1.4 }}>Nhập tên hoặc chọn từ danh sách thành viên hệ thống.</p>
                         <div className="twd-add-input-wrap">
                             <input
                                 type="text"
@@ -297,7 +284,7 @@ export default function TeamInfo() {
 
                         {availableMembers.length > 0 && (
                             <div style={{ marginTop: 16 }}>
-                                <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 8, fontWeight: 600 }}>Chọn nhanh:</div>
+                                <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 8, fontWeight: 600 }}>Chọn nhanh:</div>
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                                     {availableMembers.slice(0, 8).map((name, i) => (
                                         <button
@@ -306,11 +293,11 @@ export default function TeamInfo() {
                                             style={{
                                                 display: 'flex', alignItems: 'center', gap: 6,
                                                 padding: '5px 10px', border: '1px solid #e5e7eb', borderRadius: 20,
-                                                background: 'white', cursor: 'pointer', fontSize: 12, color: '#374151',
+                                                background: 'var(--bg-secondary)', cursor: 'pointer', fontSize: 12, color: 'var(--text-secondary)',
                                                 transition: 'all 0.15s'
                                             }}
                                             onMouseEnter={e => { (e.target as HTMLElement).style.borderColor = '#10b981'; (e.target as HTMLElement).style.background = '#ecfdf5'; }}
-                                            onMouseLeave={e => { (e.target as HTMLElement).style.borderColor = '#e5e7eb'; (e.target as HTMLElement).style.background = 'white'; }}
+                                            onMouseLeave={e => { (e.target as HTMLElement).style.borderColor = 'var(--border-color)'; (e.target as HTMLElement).style.background = 'var(--bg-secondary)'; }}
                                         >
                                             <PersonIcon style={{ fontSize: 14, color: '#9ca3af' }} />
                                             {name}
