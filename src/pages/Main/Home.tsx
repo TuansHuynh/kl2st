@@ -58,7 +58,7 @@ export default function Home() {
     const [searchQuery, setSearchQuery] = useState('');
     const [filterType, setFilterType] = useState('all');
     const fileInputRef = useRef<HTMLInputElement>(null);
-    
+
     // Upload Modal states
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
@@ -196,7 +196,7 @@ export default function Home() {
 
     return (
         <div className="document-storage-container">
-            
+
 
             <div className="doc-header-section">
                 <div className="doc-title-wrapper">
@@ -373,7 +373,7 @@ export default function Home() {
                     )}
                 </div>
             </div>
-            
+
             <UploadModal
                 isOpen={isUploadModalOpen}
                 onClose={() => {
@@ -386,13 +386,13 @@ export default function Home() {
                 }}
             />
 
-            <PreviewModal 
-                isOpen={!!previewDoc} 
+            <PreviewModal
+                isOpen={!!previewDoc}
                 onClose={() => {
                     if (previewDoc) URL.revokeObjectURL(previewDoc.url);
                     setPreviewDoc(null);
-                }} 
-                previewDoc={previewDoc} 
+                }}
+                previewDoc={previewDoc}
             />
         </div>
     );
